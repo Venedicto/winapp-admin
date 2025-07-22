@@ -1,0 +1,82 @@
+---
+description: "Overview of all Cursor rules in this project"
+---
+
+# Cursor Rules Overview
+
+This document provides an overview of all the Cursor rules configured for this project.
+
+## 📋 Active Rules
+
+### 1. **No Stats Components** (`no-stats-components.mdc`)
+- **Type**: Always Applied
+- **Purpose**: Prevents creation of statistics/metrics components unless explicitly requested
+- **Scope**: All files
+
+### 2. **Small Components** (`small-components.mdc`)  
+- **Type**: Always Applied
+- **Purpose**: Enforces creating small, modular, single-responsibility components
+- **Scope**: All files
+- **Guidelines**: Max 50-80 lines per component
+
+### 3. **React Component Patterns** (`react-component-patterns.mdc`)
+- **Type**: TypeScript/React files only
+- **Purpose**: Defines consistent patterns for React components, props, and file organization
+- **Scope**: `*.tsx, *.ts` files
+
+### 4. **UI Design Patterns** (`ui-design-patterns.mdc`)
+- **Type**: React/JSX files only  
+- **Purpose**: Establishes consistent UI patterns, Tailwind CSS usage, and design guidelines
+- **Scope**: `*.tsx, *.jsx` files
+
+## 🎯 Key Principles
+
+### Component Architecture:
+- **Small & Focused**: Each component has a single responsibility
+- **Reusable**: Components can be used across different contexts
+- **Modular**: Easy to test, maintain, and understand
+
+### File Organization:
+```
+src/components/
+├── ui/           # Reusable UI components (Button, Input, etc.)
+├── [domain]/     # Domain-specific components (category, business, user)
+└── layout/       # Layout components
+```
+
+### Naming Conventions:
+- `[Domain]ActionButtons.tsx` - CRUD action buttons
+- `[Domain]FormModal.tsx` - Create/edit modals
+- `[Domain]List.tsx` - List pages
+- `index.ts` - Barrel exports
+
+### Design System:
+- **Colors**: Purple primary, Gray secondary, semantic colors for status
+- **Spacing**: Consistent Tailwind spacing scale (`space-y-8`, `p-4 lg:p-6`)
+- **Components**: Use established Button variants, consistent modal styling
+
+## 🚫 What to Avoid
+
+### Components:
+- ❌ Large monolithic components (>80 lines)
+- ❌ Statistics/metrics components (unless requested)
+- ❌ Mixed responsibilities in single component
+
+### Styling:
+- ❌ Hardcoded colors outside established palette
+- ❌ Inconsistent spacing values
+- ❌ Missing hover/focus states
+
+## 📝 How Rules Are Applied
+
+- **Always Applied**: Rules that apply to every request automatically
+- **File-Specific**: Rules that only apply to certain file types based on glob patterns
+- **Manual**: Rules that can be manually referenced when needed
+
+## 🔧 Modifying Rules
+
+To modify these rules:
+1. Edit the corresponding `.mdc` file in `.cursor/rules/`
+2. Update the frontmatter metadata if changing scope
+3. Test the changes in practice
+4. Update this README if needed

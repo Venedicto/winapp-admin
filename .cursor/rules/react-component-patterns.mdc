@@ -1,0 +1,137 @@
+---
+globs: "*.tsx,*.ts"
+description: "React/TypeScript component patterns and structure"
+---
+
+# React Component Patterns
+
+Follow these established patterns from the project for consistent component structure and organization.
+
+## Component Directory Structure:
+```
+src/components/
+├── ui/           # Reusable UI components
+├── forms/        # Form-specific components  
+├── layout/       # Layout components
+├── business/     # Business domain components
+├── user/         # User domain components
+├── category/     # Category domain components
+└── [domain]/     # Other domain-specific components
+```
+
+## Component File Patterns:
+
+### 1. Action Buttons Pattern:
+```tsx
+// [Domain]ActionButtons.tsx
+function CategoryActionButtons({ category, type, onEdit, onDelete }) {
+  return (
+    <div className="flex items-center gap-2">
+      <button onClick={() => onEdit(category)}>Edit</button>
+      <button onClick={() => onDelete(category.id)}>Delete</button>
+      <AreYouSureModal />
+    </div>
+  )
+}
+```
+
+### 2. Form Modal Pattern:
+```tsx
+// [Domain]FormModal.tsx  
+function CategoryFormModal({ isOpen, onClose, onSave, category, type }) {
+  return (
+    <dialog>
+      <form onSubmit={handleSubmit}>
+        <Input />
+        <Button type="submit" />
+      </form>
+    </dialog>
+  )
+}
+```
+
+### 3. List Page Pattern:
+```tsx
+// [Domain]List.tsx
+function BusinessCategoriesList() {
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showModal, setShowModal] = useState(false)
+  
+  return (
+    <div className="space-y-8">
+      <Header />
+      <SearchWithFilters />
+      <Table />
+      <FormModal />
+    </div>
+  )
+}
+```
+
+## TypeScript Patterns:
+
+### Interface Naming:
+```tsx
+// Props interfaces
+interface CategoryActionButtonsProps {
+  category: BusinessCategory | ProductCategory
+  onEdit?: (category: Category) => void
+}
+
+// Base entity interfaces  
+interface BusinessCategory {
+  id: string
+  name: string
+  image: string
+  createdAt: string
+  updatedAt: string
+  deletedAt: string | null
+}
+```
+
+### Utility Functions:
+```tsx
+// [domain]TableColumns.tsx
+export const getCategoryTableColumns = (
+  type: CategoryType,
+  onEdit?: (category: Category) => void
+): TableColumn<Category>[] => [...]
+
+// [domain]Filters.ts
+export function filterCategories(
+  categories: Category[],
+  searchQuery: string
+): Category[] { ... }
+```
+
+## Export Patterns:
+
+### Index Files:
+```tsx
+// components/category/index.ts
+export { default as CategoryActionButtons } from './CategoryActionButtons'
+export { default as CategoryFormModal } from './CategoryFormModal'
+
+// utils/index.ts  
+export * from './categoryTableColumns'
+export * from './categoryFilters'
+```
+
+## Component Props Patterns:
+
+### Standard Props:
+- `onEdit?: (item: T) => void`
+- `onDelete?: (id: string) => void`  
+- `onSave?: (data: T) => void`
+- `isLoading?: boolean`
+- `isOpen?: boolean`
+- `onClose?: () => void`
+
+## Import Patterns:
+```tsx
+import { useState, useEffect, useMemo } from 'react'
+import type { BusinessCategory } from '../types/Category'
+import { CategoryActionButtons } from '../components/category'
+import { getCategoryTableColumns } from '../utils'
+```

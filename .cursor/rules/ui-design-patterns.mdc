@@ -1,0 +1,158 @@
+---
+globs: "*.tsx,*.jsx"
+description: "UI design patterns and Tailwind CSS guidelines"
+---
+
+# UI Design Patterns
+
+Follow these established UI patterns and design guidelines from the project.
+
+## Layout Patterns:
+
+### Page Layout:
+```tsx
+return (
+  <div className="space-y-8 bg-white">
+    {/* Header */}
+    <div className="flex justify-between items-center">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Page Title</h1>
+        <p className="text-gray-600">Page description</p>
+      </div>
+      <Button variant="primary">Action Button</Button>
+    </div>
+
+    {/* Search/Filters */}
+    <SearchWithFilters />
+
+    {/* Main Content */}
+    <Table />
+    
+    {/* Modals */}
+    <FormModal />
+  </div>
+)
+```
+
+### Card/Modal Design:
+```tsx
+// Modal styling
+<div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+  <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-6 text-white">
+    <h2 className="text-xl font-bold">Modal Title</h2>
+  </div>
+  <div className="p-6 space-y-4">
+    {/* Content */}
+  </div>
+</div>
+
+// Card styling  
+<div className="bg-white/80 backdrop-blur-sm p-4 lg:p-6 rounded-2xl shadow-lg border border-white/50 hover:shadow-xl transition-all duration-300">
+```
+
+## Color Palette:
+
+### Primary Colors:
+- **Purple**: `purple-600`, `purple-700`, `purple-800` (primary actions)
+- **Blue**: `blue-600`, `blue-700` (secondary actions, gradients)
+- **Gray**: `gray-50`, `gray-100`, `gray-600`, `gray-900` (text, backgrounds)
+
+### Status Colors:
+- **Success/Active**: `green-600`, `green-100`
+- **Warning/Pending**: `orange-600`, `orange-100`  
+- **Danger/Error**: `red-600`, `red-100`
+
+### Usage Examples:
+```tsx
+// Buttons
+<Button variant="primary">   {/* purple-600 */}
+<Button variant="secondary"> {/* gray-600 */}
+<Button variant="danger">    {/* red-600 */}
+
+// Status badges
+className="bg-green-100 text-green-800"  // Active
+className="bg-orange-100 text-orange-800" // Pending
+className="bg-red-100 text-red-800"      // Error
+```
+
+## Spacing and Typography:
+
+### Spacing Scale:
+```tsx
+// Container spacing
+<div className="space-y-8">         // Large sections
+<div className="space-y-4">         // Form elements
+<div className="gap-2">             // Button groups
+<div className="p-4 lg:p-6">       // Responsive padding
+
+// Margins
+className="mb-2"                    // Small margins
+className="mb-4"                    // Standard margins
+className="mb-6"                    // Large margins
+```
+
+### Typography:
+```tsx
+// Headers
+<h1 className="text-2xl font-bold text-gray-900">
+<h2 className="text-xl font-bold">
+<h3 className="text-lg font-semibold">
+
+// Body text
+<p className="text-gray-600">       // Descriptions
+<p className="text-sm text-gray-500"> // Secondary text
+<span className="text-xs">          // Small text
+```
+
+## Interactive States:
+
+### Hover/Focus States:
+```tsx
+// Buttons and interactive elements
+hover:bg-purple-700
+hover:shadow-xl
+hover:scale-[1.02]
+focus:ring-2 focus:ring-purple-500
+
+// Transitions
+transition-all duration-300
+transition-colors
+```
+
+## Responsive Design:
+
+### Breakpoint Usage:
+```tsx
+// Mobile first approach
+className="p-4 lg:p-6"              // Padding
+className="text-sm lg:text-base"    // Text size
+className="hidden lg:block"         // Visibility
+className="grid-cols-1 lg:grid-cols-3" // Layout
+
+// Common breakpoints: sm, md, lg, xl
+```
+
+## Icon Integration:
+
+### Consistent Icon Sizing:
+```tsx
+// Standard icon sizes
+<svg className="w-4 h-4">          // Small icons (buttons)
+<svg className="w-5 h-5">          // Medium icons
+<svg className="w-6 h-6">          // Large icons
+
+// Icon in text
+<span className="flex items-center gap-2">
+  <Icon className="w-4 h-4" />
+  Text
+</span>
+```
+
+## Avoid These Patterns:
+
+### ❌ Don't Use:
+- Hardcoded colors outside the palette
+- Inconsistent spacing values
+- Missing hover/focus states
+- Non-responsive design
+- Mixing different design systems

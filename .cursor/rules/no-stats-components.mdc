@@ -1,0 +1,42 @@
+---
+alwaysApply: true
+description: "Avoid creating statistics components"
+---
+
+# No Stats Components Rule
+
+Do NOT create statistics (stats) components or cards showing metrics, counts, or analytics data unless explicitly requested by the user.
+
+## What to Avoid:
+- Components like `Stats`, `StatsCards`, `Metrics`, `Analytics`
+- Components that display counts, totals, percentages, or summary data
+- Dashboard-style metric cards or widgets
+- Real-time data visualization components
+
+## Examples of Stats Components to Avoid:
+```tsx
+// ❌ DON'T CREATE
+function BusinessStats({ businesses }) {
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      <div>Total: {businesses.length}</div>
+      <div>Active: {businesses.filter(b => b.active).length}</div>
+      <div>Pending: {businesses.filter(b => b.pending).length}</div>
+    </div>
+  )
+}
+
+// ❌ DON'T CREATE
+function CategoryStats({ categories, type }) {
+  // Any component showing statistics or metrics
+}
+```
+
+## What to Focus On Instead:
+- Core functionality components (forms, tables, modals)
+- Navigation and layout components
+- Data management and CRUD operations
+- User interface components (buttons, inputs, etc.)
+
+## Exception:
+Only create stats/metrics components when the user explicitly asks for statistics, analytics, or dashboard metrics.

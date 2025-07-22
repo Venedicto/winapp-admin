@@ -1,0 +1,82 @@
+---
+alwaysApply: true
+description: "Always create small, modular components"
+---
+
+# Small Components Rule
+
+ALWAYS separate functionality into small, focused, reusable components. Avoid creating large monolithic components.
+
+## Component Structure Guidelines:
+
+### ✅ DO - Create Small Components:
+```tsx
+// Good: Separate concerns into small components
+function UserActionButtons({ user, onEdit, onDelete }) {
+  return (
+    <div className="flex items-center gap-2">
+      <EditButton onClick={() => onEdit(user)} />
+      <DeleteButton onClick={() => onDelete(user.id)} />
+    </div>
+  )
+}
+
+function EditButton({ onClick }) {
+  return (
+    <button onClick={onClick} className="p-2 text-blue-600">
+      <EditIcon />
+    </button>
+  )
+}
+
+function DeleteButton({ onClick }) {
+  return (
+    <button onClick={onClick} className="p-2 text-red-600">
+      <DeleteIcon />
+    </button>
+  )
+}
+```
+
+### ❌ DON'T - Create Large Monolithic Components:
+```tsx
+// Bad: Everything in one large component
+function UserManagement() {
+  return (
+    <div>
+      {/* 200+ lines of mixed concerns */}
+      <header>...</header>
+      <search>...</search>
+      <filters>...</filters>
+      <table>...</table>
+      <pagination>...</pagination>
+      <modals>...</modals>
+    </div>
+  )
+}
+```
+
+## Component Size Guidelines:
+- **Max 50-80 lines** per component
+- **Single responsibility** - one concern per component
+- **Easy to test** and understand
+- **Reusable** across different contexts
+
+## File Organization:
+Follow the existing pattern from [src/components/category/](mdc:src/components/category/):
+- `ActionButtons.tsx` - Buttons for CRUD operations
+- `FormModal.tsx` - Modal with form for create/edit
+- `index.ts` - Barrel export file
+
+## Examples from Project:
+Reference these well-structured small components:
+- [CategoryActionButtons.tsx](mdc:src/components/category/CategoryActionButtons.tsx)
+- [CategoryFormModal.tsx](mdc:src/components/category/CategoryFormModal.tsx)
+- [Button.tsx](mdc:src/components/ui/Button.tsx)
+- [Input.tsx](mdc:src/components/ui/Input.tsx)
+
+## When to Split Components:
+- When a component has multiple responsibilities
+- When a component exceeds 80 lines
+- When parts could be reused elsewhere
+- When testing becomes complex
