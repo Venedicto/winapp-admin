@@ -19,4 +19,68 @@ export interface Business {
   createdAt: string
   updatedAt: string
   deletedAt: string | null
+}
+
+// Tipos para estados de negocio según el backend.md
+export type BusinessStatus = 'Pending' | 'Acepted' | 'Rejected' | 'Suspended'
+
+export const BUSINESS_STATUS = {
+  PENDING: 'Pending' as const,
+  ACCEPTED: 'Acepted' as const, // Nota: mantiene el typo del backend
+  REJECTED: 'Rejected' as const,
+  SUSPENDED: 'Suspended' as const
+} as const
+
+// Interface para la respuesta completa de negocios
+export interface BusinessWithDetails {
+  id: string
+  name: string
+  description: string
+  status: BusinessStatus
+  address: string
+  phone: string
+  rating: number
+  category: {
+    name: string
+    image: string
+  }
+  user: {
+    fullName: string
+    email: string
+  }
+}
+
+// Interface para documentos de negocio
+export interface BusinessDocument {
+  id: string
+  type: 'bankingCertified' | 'dni' | 'constitutiveAct' | 'attorneyPower'
+  status: 'pending' | 'approved' | 'rejected'
+  url: string
+  businessId: string
+  createdAt: string
+  updatedAt: string
+}
+
+// Interfaces para requests
+export interface UpdateBusinessStatusRequest {
+  status: BusinessStatus
+}
+
+export interface UpdateDocumentStatusRequest {
+  status: 'approved' | 'rejected'
+}
+
+// Interfaces para respuestas de la API
+export interface ApiResponse<T> {
+  status: 'success' | 'error'
+  data: T
+  message?: string
+}
+
+export interface BusinessListResponse {
+  businesses: BusinessWithDetails[]
+}
+
+export interface DocumentListResponse {
+  documents: BusinessDocument[]
 } 
