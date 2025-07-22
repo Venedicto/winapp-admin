@@ -6,6 +6,7 @@ import { CategoryStats, CategoryFormModal } from '../components/category'
 import { getCategoryTableColumns } from '../utils/categoryTableColumns'
 import { filterCategories, getCategorySearchFilters } from '../utils/categoryFilters'
 import Button from '../components/ui/Button'
+import { useToastHelpers } from '../hooks/useToastHelpers'
 
 // Datos de ejemplo para mostrar la tabla
 const mockProductCategories: ProductCategory[] = [
@@ -49,6 +50,8 @@ function ProductCategoriesList() {
   const [showFormModal, setShowFormModal] = useState(false)
   const [editingCategory, setEditingCategory] = useState<ProductCategory | null>(null)
   const [formLoading, setFormLoading] = useState(false)
+  
+  const { showSuccess, showError } = useToastHelpers()
   
   // Estados para búsqueda
   const [searchQuery, setSearchQuery] = useState('')
@@ -118,40 +121,57 @@ function ProductCategoriesList() {
       // Simular operación
       setTimeout(() => {
         setCategories(prev => prev.filter(cat => cat.id !== categoryId))
+        showSuccess('Categoría eliminada', 'La categoría de producto ha sido eliminada exitosamente')
       }, 500)
     } catch (error) {
       console.error('Error al eliminar categoría:', error)
+      showError('Error al eliminar', 'No se pudo eliminar la categoría. Inténtalo de nuevo.')
     }
   }
 
-  const handleSaveCategory = async (categoryData: Omit<ProductCategory, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>) => {
+  const handleSaveCategory = async (categoryData: { name: string; image: string | File | null }) => {
     setFormLoading(true)
     
     try {
+      // Simular subida de archivo si es un File
+      let imageUrl = categoryData.image
+      if (categoryData.image instanceof File) {
+        // Simular subida a servidor y obtener URL
+        console.log('Subiendo archivo:', categoryData.image.name)
+        // En una aplicación real, aquí subirías el archivo a tu servidor/CDN
+        imageUrl = `https://pub-309c9385e5fc49408b34f0738fa9f934.r2.dev/categories/${categoryData.image.name}`
+      }
+
+      const processedData = {
+        name: categoryData.name,
+        image: imageUrl as string
+      }
+
       if (editingCategory) {
         // Editar categoría existente
-        console.log('Actualizando categoría:', editingCategory.id, categoryData)
+        console.log('Actualizando categoría:', editingCategory.id, processedData)
         
         // Simular operación
         setTimeout(() => {
           setCategories(prev => prev.map(cat => 
             cat.id === editingCategory.id 
-              ? { ...cat, ...categoryData, updatedAt: new Date().toISOString() }
+              ? { ...cat, ...processedData, updatedAt: new Date().toISOString() }
               : cat
           ))
           setShowFormModal(false)
           setEditingCategory(null)
           setFormLoading(false)
+          showSuccess('Categoría actualizada', `La categoría "${processedData.name}" ha sido actualizada exitosamente`)
         }, 1000)
       } else {
         // Crear nueva categoría
-        console.log('Creando nueva categoría:', categoryData)
+        console.log('Creando nueva categoría:', processedData)
         
         // Simular operación
         setTimeout(() => {
           const newCategory: ProductCategory = {
             id: `new-${Date.now()}`,
-            ...categoryData,
+            ...processedData,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             deletedAt: null
@@ -159,11 +179,13 @@ function ProductCategoriesList() {
           setCategories(prev => [newCategory, ...prev])
           setShowFormModal(false)
           setFormLoading(false)
+          showSuccess('Categoría creada', `La categoría "${processedData.name}" ha sido creada exitosamente`)
         }, 1000)
       }
     } catch (error) {
       console.error('Error al guardar categoría:', error)
       setFormLoading(false)
+      showError('Error al guardar', 'No se pudo guardar la categoría. Verifica los datos e inténtalo de nuevo.')
     }
   }
 
@@ -189,9 +211,6 @@ function ProductCategoriesList() {
           size="md"
           className="flex items-center gap-2"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
           Nueva Categoría
         </Button>
       </div>

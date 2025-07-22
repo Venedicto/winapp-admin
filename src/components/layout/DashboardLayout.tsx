@@ -118,9 +118,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <div className="relative z-10 px-4 lg:px-8 py-4 border-b border-white/20 flex-shrink-0">
                       <div className="flex items-center space-x-2 lg:space-x-3">
             <div className="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm flex-shrink-0">
-              <svg className="w-5 h-5 lg:w-6 lg:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m0 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
+              <img src="/images/iso.svg" alt="WinApp" className="w-full h-full object-contain" />
             </div>
             <div className="min-w-0">
               <h1 className="text-white text-lg lg:text-xl font-bold truncate">WinApp</h1>
