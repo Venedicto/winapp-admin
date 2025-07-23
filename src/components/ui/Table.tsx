@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from 'react'
+import { type ReactNode, useState, useMemo } from 'react'
 
 /* 
   Ejemplo de uso con paginación:
@@ -271,30 +271,32 @@ function MobileCardView<T extends Record<string, any>>({
   )
 }
 
-// Hook para ordenamiento
+// Hook para ordenamiento - CORREGIDO
 function useSorting<T extends Record<string, any>>(data: T[]) {
   const [sortConfig, setSortConfig] = useState<{
     key: keyof T | string | null
     direction: 'asc' | 'desc'
   }>({ key: null, direction: 'asc' })
 
-  const sortedData = [...data].sort((a, b) => {
-    if (!sortConfig.key) return 0
+  const sortedData = useMemo(() => {
+    if (!sortConfig.key) return [...data]
 
-    const getValue = (obj: T, key: keyof T | string): any => {
-      if (typeof key === 'string' && key.includes('.')) {
-        return key.split('.').reduce((o: any, k) => o?.[k], obj)
+    return [...data].sort((a, b) => {
+      const getValue = (obj: T, key: keyof T | string): any => {
+        if (typeof key === 'string' && key.includes('.')) {
+          return key.split('.').reduce((o: any, k) => o?.[k], obj)
+        }
+        return obj[key as keyof T]
       }
-      return obj[key as keyof T]
-    }
 
-    const aValue = getValue(a, sortConfig.key)
-    const bValue = getValue(b, sortConfig.key)
+      const aValue = getValue(a, sortConfig.key!)
+      const bValue = getValue(b, sortConfig.key!)
 
-    if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1
-    if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1
-    return 0
-  })
+      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1
+      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1
+      return 0
+    })
+  }, [data, sortConfig])
 
   const requestSort = (key: keyof T | string) => {
     let direction: 'asc' | 'desc' = 'asc'
@@ -307,7 +309,7 @@ function useSorting<T extends Record<string, any>>(data: T[]) {
   return { sortedData, sortConfig, requestSort }
 }
 
-// Hook para paginación
+// Hook para paginación LOCAL
 function usePagination(initialPageSize: number = 10) {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(initialPageSize)
@@ -325,12 +327,29 @@ function usePagination(initialPageSize: number = 10) {
     setCurrentPage(1)
   }
 
+  // Función para obtener información de paginación
+  const getPaginationInfo = (totalItems: number) => {
+    const totalPages = Math.ceil(totalItems / pageSize)
+    const startIndex = (currentPage - 1) * pageSize
+    const endIndex = Math.min(startIndex + pageSize, totalItems)
+    
+    return {
+      totalPages,
+      startIndex,
+      endIndex,
+      showingFrom: startIndex + 1,
+      showingTo: endIndex,
+      totalItems
+    }
+  }
+
   return {
     currentPage,
     pageSize,
     handlePageChange,
     handlePageSizeChange,
-    resetPagination
+    resetPagination,
+    getPaginationInfo
   }
 }
 

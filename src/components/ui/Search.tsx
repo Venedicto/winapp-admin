@@ -16,8 +16,10 @@ interface SearchWithFiltersProps extends SearchProps {
     options: { label: string; value: string }[]
     value: string
     onChange: (value: string) => void
+    type?: 'select'
   }[]
   onReset?: () => void
+  initialSearchValue?: string
 }
 
 // Hook para debounce
@@ -110,11 +112,17 @@ export function SearchWithFilters({
   showClearButton = true,
   icon = 'search',
   filters = [],
-  onReset
+  onReset,
+  initialSearchValue = ''
 }: SearchWithFiltersProps) {
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(initialSearchValue)
   const [showFilters, setShowFilters] = useState(false)
   const debouncedQuery = useDebounce(query, debounceMs)
+
+  // Sincronizar con el valor inicial cuando cambie
+  useEffect(() => {
+    setQuery(initialSearchValue)
+  }, [initialSearchValue])
 
   useEffect(() => {
     onSearch(debouncedQuery)

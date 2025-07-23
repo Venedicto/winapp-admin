@@ -8,4 +8,10 @@ export * from './category'
 export * from './user'
 
 // Auth services
-export * from './auth' 
+export * from './auth'
+
+// Points services
+export * from './points'
+
+// Notification services
+export * from './notification' 

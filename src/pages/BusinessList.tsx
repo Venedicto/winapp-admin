@@ -1,11 +1,12 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Table, { usePagination } from '../components/ui/Table'
+import Table from '../components/ui/Table'
 import { SearchWithFilters } from '../components/ui/Search'
 import type { Business } from '../types/Business'
 import { BusinessStats } from '../components/business'
-import { getBusinessTableColumns, getBusinessSearchFilters, filterBusinesses } from '../utils'
+import { getBusinessTableColumns, filterBusinesses } from '../utils'
 import { useBusinesses } from '../services/business'
+import { useBusinessFilters, getBusinessSearchFilters } from '../hooks/useBusinessFilters'
 
 function BusinessList() {
   const navigate = useNavigate()
@@ -13,67 +14,87 @@ function BusinessList() {
   // Usar la query de business real
   const { data: businessResponse, isLoading, error } = useBusinesses()
   
-  // Estados para búsqueda y filtros
-  const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState('')
-  const [openFilter, setOpenFilter] = useState('')
-  
-  // Hook de paginación
+  // Hook de filtros con query parameters
   const {
-    currentPage,
+    search,
+    setSearch,
+    page,
     pageSize,
-    handlePageChange,
-    handlePageSizeChange
-  } = usePagination(5) // Comenzar con 5 elementos por página
+    setPage,
+    setPageSize,
+    sortBy,
+    sortDirection,
+    toggleSort,
+    filters,
+    setFilter,
+    clearAllFilters,
+    hasActiveFilters
+  } = useBusinessFilters()
 
-  // Obtener businesses de la respuesta del API
+  // Obtener businesses de la respuesta del API (TODOS los datos)
   const businesses = businessResponse?.data?.businesses || []
 
-  // Filtrar negocios usando la utilidad
+  // Filtrar negocios usando la utilidad (TODOS los datos filtrados)
   const filteredBusinesses = useMemo(() => {
-    return filterBusinesses(businesses, searchQuery, statusFilter, openFilter)
-  }, [businesses, searchQuery, statusFilter, openFilter])
+    return filterBusinesses(businesses, search, filters.status, filters.open)
+  }, [businesses, search, filters.status, filters.open])
 
-  // Configuración de paginación (usar datos filtrados)
+  // Aplicar ordenamiento local
+  const sortedBusinesses = useMemo(() => {
+    if (!sortBy) return filteredBusinesses
+
+    return [...filteredBusinesses].sort((a, b) => {
+      const getValue = (obj: any, key: string) => {
+        if (key.includes('.')) {
+          return key.split('.').reduce((o, k) => o?.[k], obj)
+        }
+        return obj[key]
+      }
+
+      const aValue = getValue(a, sortBy)
+      const bValue = getValue(b, sortBy)
+
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
+      return 0
+    })
+  }, [filteredBusinesses, sortBy, sortDirection])
+
+  // Aplicar paginación local
+  const paginatedBusinesses = useMemo(() => {
+    const startIndex = (page - 1) * pageSize
+    const endIndex = startIndex + pageSize
+    return sortedBusinesses.slice(startIndex, endIndex)
+  }, [sortedBusinesses, page, pageSize])
+
+  // Configuración de paginación
   const paginationConfig = {
-    currentPage,
+    currentPage: page,
     pageSize,
-    total: filteredBusinesses.length,
-    onPageChange: handlePageChange,
-    onPageSizeChange: handlePageSizeChange,
+    total: sortedBusinesses.length,
+    onPageChange: (newPage: number) => setPage(newPage),
+    onPageSizeChange: (newSize: number) => setPageSize(newSize),
     showSizeChanger: true,
-    pageSizeOptions: [5, 10, 20, 50]
+    pageSizeOptions: [5, 10, 20, 50, 100]
   }
 
   // Configuración de búsqueda y filtros
-  const handleSearch = useCallback((query: string) => {
-    setSearchQuery(query)
-    handlePageChange(1) // Resetear a la primera página al buscar
-  }, [handlePageChange])
-
-  const handleResetFilters = useCallback(() => {
-    setSearchQuery('')
-    setStatusFilter('')
-    setOpenFilter('')
-    handlePageChange(1)
-  }, [handlePageChange])
-
-  // Obtener filtros usando la utilidad
   const searchFilters = getBusinessSearchFilters(
-    statusFilter,
-    openFilter,
-    (value: string) => {
-      setStatusFilter(value)
-      handlePageChange(1)
-    },
-    (value: string) => {
-      setOpenFilter(value)
-      handlePageChange(1)
-    }
+    filters.status,
+    filters.open,
+    (value: string) => setFilter('status', value || null),
+    (value: string) => setFilter('open', value || null)
   )
 
-  // Obtener columnas de la tabla
-  const columns = getBusinessTableColumns()
+  // Obtener columnas de la tabla con ordenamiento
+  const columns = getBusinessTableColumns().map(column => ({
+    ...column,
+    sortable: true,
+    // Agregar función de ordenamiento
+    onSort: column.sortable ? () => toggleSort(column.key as string) : undefined,
+    // Indicar si está siendo ordenado
+    sortDirection: sortBy === column.key ? sortDirection : undefined
+  }))
 
   const handleRowClick = (business: Business) => {
     navigate(`/dashboard/comercios/${business.id}`)
@@ -93,25 +114,48 @@ function BusinessList() {
 
   return (
     <div className="space-y-8 bg-white">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Lista de Comercios</h1>
+          <p className="text-gray-600">
+            Mostrando {sortedBusinesses.length} de {businesses.length} comercios
+            {hasActiveFilters && ' (filtrados)'}
+          </p>
+        </div>
+        {hasActiveFilters && (
+          <button
+            onClick={clearAllFilters}
+            className="px-4 py-2 text-sm text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-colors"
+          >
+            Limpiar filtros
+          </button>
+        )}
+      </div>
+
       {/* Search and Filters */}
       <SearchWithFilters
         placeholder="Buscar comercios por nombre, descripción o dirección..."
-        onSearch={handleSearch}
-        onReset={handleResetFilters}
+        initialSearchValue={search}
+        onSearch={(query) => setSearch(query || null)}
+        onReset={clearAllFilters}
         filters={searchFilters}
       />
 
       {/* Stats cards */}
-      <BusinessStats businesses={filteredBusinesses} />
+      <BusinessStats businesses={sortedBusinesses} />
 
-      {/* Table */}
+      {/* Table con paginación y ordenamiento desde URL */}
       <Table
-        data={filteredBusinesses}
+        data={paginatedBusinesses} // Solo los datos de la página actual
         columns={columns}
         loading={isLoading}
         emptyMessage="No hay comercios registrados"
-        // onRowClick={handleRowClick}
+        onRowClick={handleRowClick}
         pagination={paginationConfig}
+        mobileCardView={true}
+        striped={true}
+        hover={true}
       />
     </div>
   )

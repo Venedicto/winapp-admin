@@ -28,7 +28,7 @@ export default function Select({
 	isDisabled,
 }: SelectProps) {
 	return (
-		<div className={`w-full md:w-[30%] ${classContainer}`}>
+		<div className={`w-full ${classContainer}`}>
 			{label && <p className="pb-2">{label}</p>}
 			<select
 				id={name}
@@ -41,7 +41,7 @@ export default function Select({
 					isInvalid ? "border-red-500" : ""
 				} p-2 ${className}`}
 			>
-				<option value="">{placeholder}</option>
+				<option disabled value="">{placeholder}</option>
 				{options.map((option) => (
 					<option key={option.value} value={option.value}>
 						{option.label}

@@ -9,6 +9,8 @@ import BusinessDetail from './pages/BusinessDetail'
 import UserList from './pages/UserList'
 import BusinessCategoriesList from './pages/BusinessCategoriesList'
 import ProductCategoriesList from './pages/ProductCategoriesList'
+import PointsConfig from './pages/PointsConfig'
+import NotificationsList from './pages/NotificationsList'
 
 function App() {
   return (
@@ -39,9 +41,9 @@ function App() {
                   <Route path="categorias" element={<Navigate to="categorias/negocios" replace />} />
                   <Route path="categorias/negocios" element={<BusinessCategoriesList />} />
                   <Route path="categorias/productos" element={<ProductCategoriesList />} />
-                  <Route path="puntos" element={<div>Balance de Puntos</div>} />
+                  <Route path="puntos" element={<PointsConfig />} />
                   <Route path="estadisticas" element={<div>Estadísticas</div>} />
-                  <Route path="notificaciones" element={<div>Notificaciones</div>} />
+                  <Route path="notificaciones" element={<NotificationsList />} />
                   <Route path="configuracion" element={<div>Configuración</div>} />
                 </Routes>
               </DashboardLayout>

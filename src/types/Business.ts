@@ -79,7 +79,7 @@ export interface ApiResponse<T> {
 }
 
 export interface BusinessListResponse {
-  businesses: BusinessWithDetails[]
+  businesses: Business[]
 }
 
 export interface DocumentListResponse {

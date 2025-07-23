@@ -69,67 +69,16 @@ export const userCreditsOptions = [
 // Función para filtrar usuarios
 export const filterUsers = (
   users: User[], 
-  searchQuery: string, 
-  roleFilter: string, 
-  subscriptionFilter: string,
-  creditsFilter: string
+  searchQuery: string
 ) => {
   return users.filter(user => {
-    // Filtro de búsqueda (busca en nombre y email)
+    // Solo filtro de búsqueda (busca en nombre, email y teléfono)
     const matchesSearch = searchQuery === '' || 
       user.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (user.phone && user.phone.includes(searchQuery))
     
-    // Filtro por rol
-    const matchesRole = roleFilter === '' || user.role === roleFilter
-    
-    // Filtro por estado de suscripciones
-    let matchesSubscription = true
-    if (subscriptionFilter !== '') {
-      const hasSubscriptions = user.subscriptions.length > 0
-      const hasActiveSubscriptions = user.subscriptions.some(sub => sub.active)
-      const hasInactiveSubscriptions = user.subscriptions.some(sub => !sub.active)
-      
-      switch (subscriptionFilter) {
-        case 'active':
-          matchesSubscription = hasActiveSubscriptions
-          break
-        case 'inactive':
-          matchesSubscription = hasInactiveSubscriptions && !hasActiveSubscriptions
-          break
-        case 'none':
-          matchesSubscription = !hasSubscriptions
-          break
-        case 'any':
-          matchesSubscription = hasSubscriptions
-          break
-        default:
-          matchesSubscription = true
-      }
-    }
-    
-    // Filtro por créditos
-    let matchesCredits = true
-    if (creditsFilter !== '') {
-      const subscriptionsWithCredits = user.subscriptions.filter(sub => parseInt(sub.credits || '0') > 0)
-      
-      switch (creditsFilter) {
-        case 'with_credits':
-          matchesCredits = subscriptionsWithCredits.length > 0
-          break
-        case 'no_credits':
-          matchesCredits = subscriptionsWithCredits.length === 0
-          break
-        case 'high_credits':
-          matchesCredits = user.subscriptions.some(sub => parseInt(sub.credits || '0') > 100)
-          break
-        default:
-          matchesCredits = true
-      }
-    }
-    
-    return matchesSearch && matchesRole && matchesSubscription && matchesCredits
+    return matchesSearch
   })
 }
 
