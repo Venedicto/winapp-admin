@@ -52,7 +52,7 @@ export const getUserTableColumns = (): TableColumn<User>[] => [
     title: 'Rol',
     width: '15%',
     hideOnMobile: true,
-    render: (role: string, user: User) => (
+    render: (_role: string, user: User) => (
       <UserStatusBadge user={user} />
     )
   },

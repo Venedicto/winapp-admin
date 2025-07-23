@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import Table from '../components/ui/Table'
 import { SearchWithFilters } from '../components/ui/Search'
-import type { BusinessCategory } from '../types/Category'
 import { getCategoryTableColumns } from '../utils/categoryTableColumns'
 import { filterCategories } from '../utils/categoryFilters'
 import { useCategoryFilters } from '../hooks/useCategoryFilters'

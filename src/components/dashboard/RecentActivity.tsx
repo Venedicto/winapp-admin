@@ -4,7 +4,7 @@ interface Activity {
   title: string
   description: string
   time: string
-  icon: string
+  icon: React.ReactNode
   color: string
   status?: string
   role?: string

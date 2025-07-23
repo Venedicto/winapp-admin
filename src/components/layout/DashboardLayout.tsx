@@ -1,32 +1,44 @@
 import { UserButton } from '@clerk/clerk-react'
 import { Link, useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import { 
+  HiHome, 
+  HiShoppingBag, 
+  HiUsers, 
+  HiFolder, 
+  HiStar, 
+  HiChartBar, 
+  HiBell,
+  HiChevronRight,
+  HiOfficeBuilding,
+  HiCube
+} from 'react-icons/hi'
 
 const menuItems = [
   {
     label: 'Dashboard',
-    icon: '🏠',
+    icon: HiHome,
     path: '/dashboard',
     description: 'Panel de control',
     active: false
   },
   {
     label: 'Comercios',
-    icon: '🏪',
+    icon: HiShoppingBag,
     path: '/dashboard/comercios',
     description: 'Gestionar tiendas',
     active: false
   },
   {
     label: 'Usuarios',
-    icon: '👥',
+    icon: HiUsers,
     path: '/dashboard/usuarios',
     description: 'Base de usuarios',
     active: false
   },
   {
     label: 'Categorías',
-    icon: '📂',
+    icon: HiFolder,
     path: '/dashboard/categorias',
     description: 'Organizar productos',
     active: false,
@@ -34,13 +46,13 @@ const menuItems = [
     submenu: [
       {
         label: 'Categorías de Negocio',
-        icon: '🏪',
+        icon: HiOfficeBuilding,
         path: '/dashboard/categorias/negocios',
         description: 'Gestionar categorías de comercios'
       },
       {
         label: 'Categorías de Producto',
-        icon: '📦',
+        icon: HiCube,
         path: '/dashboard/categorias/productos',
         description: 'Gestionar categorías de productos'
       }
@@ -48,21 +60,21 @@ const menuItems = [
   },
   {
     label: 'Balance de Puntos',
-    icon: '⭐',
+    icon: HiStar,
     path: '/dashboard/puntos',
     description: 'Sistema de rewards',
     active: false
   },
   {
     label: 'Estadísticas',
-    icon: '📊',
+    icon: HiChartBar,
     path: '/dashboard/estadisticas',
     description: 'Análisis y métricas',
     active: false
   },
   {
     label: 'Notificaciones',
-    icon: '🔔',
+    icon: HiBell,
     path: '/dashboard/notificaciones',
     description: 'Centro de mensajes',
     active: false
@@ -148,23 +160,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         }
                       `}
                     >
-                      <div className="text-2xl group-hover:scale-110 transition-transform duration-300">
-                        {item.icon}
+                      <div className="text-2xl group-hover:scale-110 transition-transform duration-300 text-white">
+                        <item.icon />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-white font-medium text-sm truncate">{item.label}</p>
                         <p className="text-purple-200 text-xs truncate hidden lg:block">{item.description}</p>
                       </div>
-                      <svg 
+                      <HiChevronRight 
                         className={`w-4 h-4 text-white/70 group-hover:text-white transition-all ${
                           isSubmenuOpen(item.label) ? 'rotate-90' : ''
                         }`} 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
+                      />
                     </button>
                     
                     {/* Submenu */}
@@ -182,8 +189,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                               }
                             `}
                           >
-                            <div className="text-lg group-hover:scale-110 transition-transform duration-300">
-                              {subItem.icon}
+                            <div className="text-lg group-hover:scale-110 transition-transform duration-300 text-white">
+                              <subItem.icon />
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-white font-medium text-xs truncate">{subItem.label}</p>
@@ -206,16 +213,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       }
                     `}
                   >
-                    <div className="text-2xl group-hover:scale-110 transition-transform duration-300">
-                      {item.icon}
+                    <div className="text-2xl group-hover:scale-110 transition-transform duration-300 text-white">
+                      <item.icon />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-white font-medium text-sm truncate">{item.label}</p>
                       <p className="text-purple-200 text-xs truncate hidden lg:block">{item.description}</p>
                     </div>
-                    <svg className="w-4 h-4 text-white/70 group-hover:text-white group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                    <HiChevronRight className="w-4 h-4 text-white/70 group-hover:text-white group-hover:translate-x-1 transition-all" />
                   </Link>
                 )}
               </div>

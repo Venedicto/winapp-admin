@@ -35,7 +35,7 @@ export function useUpdateNotification() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (updateData: UpdateNotificationRequest) => {
+    mutationFn: async (_updateData: UpdateNotificationRequest) => {
       throw new Error('Update notification not implemented in current API')
     },
     

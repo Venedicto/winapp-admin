@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBusinesses } from '../services/business'
 import { useClients } from '../services/user'
@@ -6,12 +6,12 @@ import { useBusinessCategories, useProductCategories } from '../services/categor
 import { BUSINESS_STATUS } from '../types/Business'
 import { formatDateAgora } from '../utils/dateFormat'
 import {
-  DashboardHeader,
   StatsCard,
   RecentActivity,
   SystemStatus,
   QuickActions
 } from '../components/dashboard'
+import { HiShoppingBag, HiUsers, HiFolder, HiClock, HiUser } from 'react-icons/hi'
 
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -70,7 +70,7 @@ export default function Dashboard() {
       title: string
       description: string
       time: string
-      icon: string
+      icon: React.ReactNode
       color: string
       status?: string
       role?: string
@@ -81,14 +81,14 @@ export default function Dashboard() {
     // Actividades de comercios más recientes (sin createdAt, usar orden del array)
     const recentBusinesses = businesses.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 2)
     
-    recentBusinesses.forEach((business, index) => {
+    recentBusinesses.forEach((business) => {
       activities.push({
         id: `business-${business.id}`,
         type: 'business',
         title: 'Comercio registrado',
         description: `${business.name} en el sistema`,
         time: formatDateAgora(business.createdAt),
-        icon: '🏪',
+        icon: <HiShoppingBag className="w-5 h-5" />,
         color: 'purple',
         status: business.status
       })
@@ -106,7 +106,7 @@ export default function Dashboard() {
         title: 'Usuario registrado',
         description: `${user.fullName} - ${user.email}`,
         time: formatDateAgora(user.createdAt),
-        icon: '👤',
+        icon: <HiUser className="w-5 h-5" />,
         color: 'green',
         role: user.role
       })
@@ -132,7 +132,7 @@ export default function Dashboard() {
     {
       title: 'Comercios Activos',
       value: formatNumber(stats.activeBusinesses),
-      icon: '🏪',
+      icon: <HiShoppingBag className="w-8 h-8" color='#000'/>,
       loading: businessLoading,
       onClick: () => navigate('/dashboard/comercios'),
       growth: {
@@ -144,11 +144,15 @@ export default function Dashboard() {
     {
       title: 'Comercios Pendientes',
       value: stats.pendingBusinesses,
-      icon: '⏳',
+      icon: <HiClock className="w-8 h-8" color='#000'/>,
       loading: businessLoading,
       onClick: () => navigate('/dashboard/comercios?status=pending'),
-      growth: {
+      growth: stats.pendingBusinesses > 0 ? {
         value: 'Requieren revisión',
+        isPositive: false,
+        icon: 'dot' as const
+      } : {
+        value: 'No hay  pendientes',
         isPositive: false,
         icon: 'dot' as const
       }
@@ -156,7 +160,7 @@ export default function Dashboard() {
     {
       title: 'Usuarios Registrados',
       value: formatNumber(stats.totalUsers),
-      icon: '👥',
+      icon: <HiUsers className="w-8 h-8" color='#000'/>,
       loading: clientsLoading,
       onClick: () => navigate('/dashboard/usuarios'),
       growth: {
@@ -168,9 +172,13 @@ export default function Dashboard() {
     {
       title: 'Total Categorías',
       value: stats.totalCategories,
-      icon: '📋',
+      icon: <HiFolder className="w-8 h-8" color='#000'/>,
       loading: businessCategoriesLoading || productCategoriesLoading,
-      growth: undefined
+      growth: {
+        value: 'Negocios y Productos',
+        isPositive: false,
+        icon: 'pulse' as const
+      }
     }
   ]
 

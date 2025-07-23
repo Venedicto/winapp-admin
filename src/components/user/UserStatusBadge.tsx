@@ -42,19 +42,6 @@ export default function UserStatusBadge({ user }: UserStatusBadgeProps) {
     }
   }
 
-  const getSubscriptionStatus = () => {
-    if (user.subscriptions.length === 0) {
-      return {
-        label: 'Sin suscripciones',
-        icon: '📭',
-        bgColor: 'bg-gray-100',
-        textColor: 'text-gray-600',
-        borderColor: 'border-gray-200'
-      }
-    }
-
-
-  }
 
   const roleConfig = getRoleConfig(user.role)
 

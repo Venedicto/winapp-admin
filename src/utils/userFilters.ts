@@ -1,4 +1,4 @@
-import type { User, UserRole } from '../types/User'
+import type { User } from '../types/User'
 
 export const getUserSearchFilters = (
   roleFilter: string,

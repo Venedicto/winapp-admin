@@ -1,12 +1,12 @@
 import { useMutation } from '@tanstack/react-query'
-import { useSignIn, useAuth } from '@clerk/clerk-react'
+import { useSignIn, useAuth, useUser } from '@clerk/clerk-react'
 import { useNavigate } from 'react-router-dom'
 import type { LoginCredentials, LoginResponse } from './types'
 
 // Hook para mutation de login
 export const useLoginMutation = () => {
   const { signIn, setActive } = useSignIn()
-  const { getToken } = useAuth()
+  const { user } = useUser()
   const navigate = useNavigate()
 
   return useMutation<LoginResponse, Error, LoginCredentials>({
@@ -25,12 +25,8 @@ export const useLoginMutation = () => {
         if (result.status === 'complete') {
           // Establecer la sesión como activa
           await setActive({ session: result.createdSessionId })
-          
-          // Obtener el token para verificar el rol de admin
-          const token = await getToken()
-          
-          // Aquí podrías hacer una verificación adicional del rol de admin
-          // contra tu backend si es necesario
+
+          navigate('/dashboard')
           
           return {
             success: true,
@@ -43,9 +39,18 @@ export const useLoginMutation = () => {
         throw new Error(error.errors?.[0]?.message || 'Error en el login')
       }
     },
-    onSuccess: (data) => {
-      // Redirigir al dashboard después del login exitoso
-      navigate('/dashboard')
+    onSuccess: async () => {
+      // Esperar un momento para que los metadatos se carguen
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Verificar si el usuario es admin antes de redirigir
+      if (user?.publicMetadata?.role === 'Admin' || user?.publicMetadata?.role === 'admin') {
+        navigate('/dashboard')
+      } else {
+        // Si no es admin, mostrar error o redirigir a una página de acceso denegado
+        console.error('Usuario no tiene permisos de administrador')
+        // No redirigir automáticamente, dejar que AdminRoute maneje la verificación
+      }
     },
     onError: (error) => {
       console.error('Error de autenticación:', error)

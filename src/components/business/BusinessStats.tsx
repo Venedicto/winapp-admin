@@ -1,4 +1,6 @@
 import type { Business } from '../../types/Business'
+import { HiShoppingBag, HiCheckCircle, HiClock } from 'react-icons/hi'
+
 
 interface BusinessStatsProps {
   businesses: Business[]
@@ -13,7 +15,9 @@ function BusinessStats({ businesses }: BusinessStatsProps) {
             <p className="text-xs lg:text-sm font-medium text-gray-600 mb-1 truncate">Total Comercios</p>
             <p className="text-xl lg:text-2xl font-bold text-purple-600">{businesses.length}</p>
           </div>
-          <div className="text-2xl lg:text-3xl flex-shrink-0 ml-2">🏪</div>
+          <div className="text-2xl lg:text-3xl flex-shrink-0 ml-2 text-purple-600">
+            <HiShoppingBag />
+          </div>
         </div>
       </div>
       
@@ -25,7 +29,9 @@ function BusinessStats({ businesses }: BusinessStatsProps) {
               {businesses.filter(b => b.status === 'Acepted').length}
             </p>
           </div>
-          <div className="text-2xl lg:text-3xl flex-shrink-0 ml-2">✅</div>
+          <div className="text-2xl lg:text-3xl flex-shrink-0 ml-2 text-green-600">
+            <HiCheckCircle />
+          </div>
         </div>
       </div>
       
@@ -37,7 +43,9 @@ function BusinessStats({ businesses }: BusinessStatsProps) {
               {businesses.filter(b => b.status === 'Pending').length}
             </p>
           </div>
-          <div className="text-2xl lg:text-3xl flex-shrink-0 ml-2">⏳</div>
+          <div className="text-2xl lg:text-3xl flex-shrink-0 ml-2 text-orange-600">
+            <HiClock />
+          </div>
         </div>
       </div>
     </div>

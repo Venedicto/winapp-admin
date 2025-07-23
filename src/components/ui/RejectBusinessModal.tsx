@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import Button from './Button'
-import Input from './Input'
 
 interface RejectBusinessModalProps {
   isOpen: boolean

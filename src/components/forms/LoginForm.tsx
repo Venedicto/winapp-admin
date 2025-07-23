@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import Input from '../ui/Input';
-import Button from '../ui/Button';
 import { useLoginMutation } from '../../services/auth';
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  
   
   // Usar la mutation de login
   const loginMutation = useLoginMutation();
@@ -140,18 +140,14 @@ const LoginForm: React.FC = () => {
                 </a>
               </div>
               
-              <Button
-                type="submit"
-                isLoading={loginMutation.isPending}
-                isDisabled={loginMutation.isPending}
-              >
-                <span className="flex items-center justify-center space-x-2">
-                  <span>Ingresar</span>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </span>
-              </Button>
+              <button
+              onClick={handleSubmit}
+              disabled={loginMutation.isPending}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+             
+              {loginMutation.isPending ? 'Procesando...' : 'Ingresar'}
+            </button>
             </form>
             
           </div>

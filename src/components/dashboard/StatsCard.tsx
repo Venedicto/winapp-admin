@@ -2,7 +2,7 @@ interface StatsCardProps {
   title: string
   value: string | number
   subtitle: string
-  icon: string
+  icon: React.ReactNode
   loading?: boolean
   onClick?: () => void
   growth?: {

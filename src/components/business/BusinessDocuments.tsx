@@ -13,29 +13,8 @@ const documentTypeLabels: Record<string, string> = {
   attorneyPower: 'Poder Notarial'
 }
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'approved':
-      return 'bg-green-100 text-green-800 border-green-200'
-    case 'rejected':
-      return 'bg-red-100 text-red-800 border-red-200'
-    case 'pending':
-    default:
-      return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-  }
-}
 
-const getStatusLabel = (status: string) => {
-  switch (status) {
-    case 'approved':
-      return 'Aprobado'
-    case 'rejected':
-      return 'Rechazado'
-    case 'pending':
-    default:
-      return 'Pendiente'
-  }
-}
+
 
 function BusinessDocuments({ business }: BusinessDocumentsProps) {
   const { data: documentsResponse, isLoading } = useBusinessDocuments()

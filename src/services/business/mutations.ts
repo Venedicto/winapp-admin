@@ -21,7 +21,7 @@ export const useUpdateBusinessStatus = () => {
       }
       return updateBusinessStatus(token!, businessId, requestData)
     },
-    onSuccess: async (data, variables) => {
+    onSuccess: async (_data, variables) => {
       // 1. Invalidar y refrescar la query específica del business por ID (PRIORITARIO)
       await queryClient.invalidateQueries({ 
         queryKey: ['business', variables.businessId],

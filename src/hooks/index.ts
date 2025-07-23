@@ -5,4 +5,8 @@ export { useUserFilters, getUserSearchFilters } from './useUserFilters'
 
 // Otros hooks existentes
 export { useCategoryForm } from './useCategoryForm'
-export { useToastHelpers } from './useToastHelpers' 
+export { useToastHelpers } from './useToastHelpers'
+
+// Hooks de autenticación
+export { useAdminAuth } from './useAdminAuth'
+export { useUserRole } from './useUserRole' 

@@ -12,18 +12,12 @@ interface UserActionButtonsProps {
 
 export default function UserActionButtons({ 
   user, 
-  onEdit, 
   onDelete, 
-  onToggleSubscription,
-  onSendEmail,
-  onManageCredits
+
 }: UserActionButtonsProps) {
   const [isOpen, setIsOpen] = useState(false)
 
-  const handleEdit = () => {
-    onEdit?.(user)
-    setIsOpen(false)
-  }
+
 
   const handleDelete = () => {
     if (window.confirm(`¿Estás seguro de que deseas eliminar al usuario ${user.fullName}?`)) {
@@ -32,23 +26,7 @@ export default function UserActionButtons({
     setIsOpen(false)
   }
 
-  const handleToggleSubscription = () => {
-    onToggleSubscription?.(user)
-    setIsOpen(false)
-  }
 
-  const handleSendEmail = () => {
-    onSendEmail?.(user)
-    setIsOpen(false)
-  }
-
-  const handleManageCredits = () => {
-    onManageCredits?.(user)
-    setIsOpen(false)
-  }
-
-  const hasActiveSubscriptions = user.subscriptions.some(sub => sub.active)
-  const subscriptionsWithCredits = user.subscriptions.filter(sub => parseInt(sub.credits || '0') > 0)
 
   return (
     <div className="relative inline-block text-left">

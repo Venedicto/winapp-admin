@@ -6,7 +6,7 @@ interface BusinessBasicInfoProps {
 }
 
 function BusinessBasicInfo({ business }: BusinessBasicInfoProps) {
-  const { data: categoryResponse,isLoading,error } = useBusinessCategoryById(business.categoryId)
+  const { data: categoryResponse,isLoading } = useBusinessCategoryById(business.categoryId)
   const category = categoryResponse?.data?.businessCategory
   return (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden">

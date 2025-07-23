@@ -110,7 +110,6 @@ export function SearchWithFilters({
   className = "",
   debounceMs = 300,
   showClearButton = true,
-  icon = 'search',
   filters = [],
   onReset,
   initialSearchValue = ''
