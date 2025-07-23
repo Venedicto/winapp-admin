@@ -69,9 +69,7 @@ const LoginForm: React.FC = () => {
           
           <div className="z-10">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-8 backdrop-blur-sm">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m0 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
+            <img src="/images/iso.svg" alt="WinApp" className="w-full h-full object-contain" />
             </div>
             <h1 className="text-5xl font-bold mb-6 text-white leading-tight">
               BIENVENIDOS
