@@ -2,7 +2,7 @@
 export * from './api'
 
 // Queries
-export { useBusinessCategories, useProductCategories } from './queries'
+export { useBusinessCategories, useProductCategories, useBusinessCategoryById } from './queries'
 
 // Mutations para categorías de negocios
 export { 

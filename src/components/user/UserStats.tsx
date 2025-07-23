@@ -6,17 +6,16 @@ interface UserStatsProps {
 
 export default function UserStats({ users }: UserStatsProps) {
   const stats = {
-    total: users.length,
-    clients: users.filter(user => user.role === 'Client').length,
-    admins: users.filter(user => user.role === 'Admin').length,
-    businessOwners: users.filter(user => user.role === 'Partner').length,
+    totalUsers: users.length,
+    withBusiness: users.filter(user => user.role === 'Partner').length,
     withSubscriptions: users.filter(user => user.subscriptions.length > 0).length,
-    activeSubscriptions: users.filter(user => 
-      user.subscriptions.some(sub => sub.active)
-    ).length,
     withCredits: users.filter(user => 
       user.subscriptions.some(sub => parseInt(sub.credits || '0') > 0)
     ).length,
+    withActiveSubscriptions: users.filter(user => 
+      user.subscriptions.some(sub => sub.active)
+    ).length,
+   
     // Contar total de suscripciones con créditos (no usuarios)
     subscriptionsWithCredits: users.reduce((total, user) => 
       total + user.subscriptions.filter(sub => parseInt(sub.credits || '0') > 0).length, 0
@@ -25,28 +24,28 @@ export default function UserStats({ users }: UserStatsProps) {
 
   const statCards = [
     {
-      title: 'Total Usuarios',
-      value: stats.total,
+      title: 'Usuarios Registrados',
+      value: stats.totalUsers,
       icon: '👥',
       bgColor: 'bg-gradient-to-br from-blue-500 to-blue-600',
       textColor: 'text-white'
     },
     {
-      title: 'Clientes',
-      value: stats.clients,
+      title: 'Usuarios con Comercio',
+      value: stats.withBusiness,
       icon: '👤',
       bgColor: 'bg-gradient-to-br from-green-500 to-green-600',
       textColor: 'text-white'
     },
     {
-      title: 'Con Suscripciones',
+      title: 'Usuarios con Suscripciones',
       value: stats.withSubscriptions,
       icon: '📋',
       bgColor: 'bg-gradient-to-br from-purple-500 to-purple-600',
       textColor: 'text-white'
     },
     {
-      title: 'Suscripciones con Créditos',
+      title: 'Suscripciones con Créditos Disponibles',
       value: stats.subscriptionsWithCredits,
       icon: '💰',
       bgColor: 'bg-gradient-to-br from-indigo-500 to-indigo-600',
@@ -76,18 +75,18 @@ export default function UserStats({ users }: UserStatsProps) {
           </div>
           
           {/* Indicador de porcentaje */}
-          {stats.total > 0 && index < 3 && (
+          {stats.totalUsers > 0 && index < 3 && (
             <div className="mt-3 lg:mt-4">
               <div className="flex items-center justify-between text-xs lg:text-sm opacity-90">
                 <span>% del total</span>
                 <span className="font-semibold">
-                  {((card.value / stats.total) * 100).toFixed(1)}%
+                  {((card.value / stats.totalUsers) * 100).toFixed(1)}%
                 </span>
               </div>
               <div className="mt-1 lg:mt-2 bg-white/20 rounded-full h-1.5 lg:h-2">
                 <div
                   className="bg-white rounded-full h-1.5 lg:h-2 transition-all duration-500"
-                  style={{ width: `${(card.value / stats.total) * 100}%` }}
+                  style={{ width: `${(card.value / stats.totalUsers) * 100}%` }}
                 />
               </div>
             </div>

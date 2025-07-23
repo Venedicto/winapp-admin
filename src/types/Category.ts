@@ -37,9 +37,9 @@ export interface ApiResponse<T> {
 }
 
 export interface BusinessCategoryListResponse {
-  categories: BusinessCategory[]
+  businessCategories: BusinessCategory[]
 }
 
 export interface ProductCategoryListResponse {
-  categories: ProductCategory[]
+  productCategories: ProductCategory[]
 } 

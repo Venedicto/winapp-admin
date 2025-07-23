@@ -1,47 +1,28 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import Table, { usePagination } from '../components/ui/Table'
 import { SearchWithFilters } from '../components/ui/Search'
 import type { BusinessCategory } from '../types/Category'
-import { CategoryStats, CategoryFormModal } from '../components/category'
+import { CategoryFormModal } from '../components/category'
 import { getCategoryTableColumns } from '../utils/categoryTableColumns'
 import { filterCategories, getCategorySearchFilters } from '../utils/categoryFilters'
 import Button from '../components/ui/Button'
 import { useToastHelpers } from '../hooks/useToastHelpers'
-
-// Datos de ejemplo para mostrar la tabla
-const mockBusinessCategories: BusinessCategory[] = [
-  {
-    "id": "bbccaf2d-9819-4236-93af-8e2b3f371a93",
-    "name": "Heladería",
-    "image": "https://pub-309c9385e5fc49408b34f0738fa9f934.r2.dev/categories/f12700d2-c09b-4b0d-a041-0b831e7665fa.png",
-    "createdAt": "2025-05-16T18:45:41.955Z",
-    "updatedAt": "2025-05-16T18:45:41.955Z",
-    "deletedAt": null
-  },
-  {
-    "id": "9c4ad151-3bd9-4dca-9705-26d777340ed1",
-    "name": "Restaurante",
-    "image": "https://pub-309c9385e5fc49408b34f0738fa9f934.r2.dev/categories/restaurant.png",
-    "createdAt": "2024-12-10T14:30:25.123Z",
-    "updatedAt": "2024-12-15T09:22:33.456Z",
-    "deletedAt": null
-  },
-  {
-    "id": "7a8b9c10-1234-5678-90ab-cdef12345678",
-    "name": "Farmacia",
-    "image": "https://pub-309c9385e5fc49408b34f0738fa9f934.r2.dev/categories/pharmacy.png",
-    "createdAt": "2024-11-20T10:15:30.789Z",
-    "updatedAt": "2024-12-01T16:45:20.321Z",
-    "deletedAt": null
-  }
-]
+import { 
+  useBusinessCategories, 
+  useCreateBusinessCategory, 
+  useUpdateBusinessCategory, 
+  useDeleteBusinessCategory 
+} from '../services/category'
 
 function BusinessCategoriesList() {
-  const [categories, setCategories] = useState<BusinessCategory[]>([])
-  const [loading, setLoading] = useState(true)
+  // Usar las queries y mutations reales
+  const { data: categoriesResponse, isLoading, error } = useBusinessCategories()
+  const createCategoryMutation = useCreateBusinessCategory()
+  const updateCategoryMutation = useUpdateBusinessCategory()
+  const deleteCategoryMutation = useDeleteBusinessCategory()
+  
   const [showFormModal, setShowFormModal] = useState(false)
   const [editingCategory, setEditingCategory] = useState<BusinessCategory | null>(null)
-  const [formLoading, setFormLoading] = useState(false)
   
   const { showSuccess, showError } = useToastHelpers()
   
@@ -56,13 +37,8 @@ function BusinessCategoriesList() {
     handlePageSizeChange
   } = usePagination(10)
 
-  useEffect(() => {
-    // Simular carga de datos
-    setTimeout(() => {
-      setCategories(mockBusinessCategories)
-      setLoading(false)
-    }, 1000)
-  }, [])
+  // Obtener categorías de la respuesta del API
+  const categories = categoriesResponse?.data?.businessCategories || []
 
   // Filtrar categorías usando la utilidad
   const filteredCategories = useMemo(() => {
@@ -107,77 +83,43 @@ function BusinessCategoriesList() {
 
   const handleDelete = async (categoryId: string) => {
     try {
-      // Aquí iría la llamada a la API para eliminar
-      console.log('Eliminando categoría:', categoryId)
-      
-      // Simular operación
-      setTimeout(() => {
-        setCategories(prev => prev.filter(cat => cat.id !== categoryId))
-        showSuccess('Categoría eliminada', 'La categoría de negocio ha sido eliminada exitosamente')
-      }, 500)
-    } catch (error) {
+      await deleteCategoryMutation.mutateAsync({ categoryId })
+      showSuccess('Categoría eliminada', 'La categoría de negocio ha sido eliminada exitosamente')
+    } catch (error: any) {
       console.error('Error al eliminar categoría:', error)
-      showError('Error al eliminar', 'No se pudo eliminar la categoría. Inténtalo de nuevo.')
+      showError('Error al eliminar', error.message || 'No se pudo eliminar la categoría. Inténtalo de nuevo.')
     }
   }
 
   const handleSaveCategory = async (categoryData: { name: string; image: string | File | null }) => {
-    setFormLoading(true)
-    
     try {
-      // Simular subida de archivo si es un File
-      let imageUrl = categoryData.image
-      if (categoryData.image instanceof File) {
-        // Simular subida a servidor y obtener URL
-        console.log('Subiendo archivo:', categoryData.image.name)
-        // En una aplicación real, aquí subirías el archivo a tu servidor/CDN
-        imageUrl = `https://pub-309c9385e5fc49408b34f0738fa9f934.r2.dev/categories/${categoryData.image.name}`
-      }
-
-      const processedData = {
-        name: categoryData.name,
-        image: imageUrl as string
-      }
-
       if (editingCategory) {
         // Editar categoría existente
-        console.log('Actualizando categoría:', editingCategory.id, processedData)
-        
-        // Simular operación
-        setTimeout(() => {
-          setCategories(prev => prev.map(cat => 
-            cat.id === editingCategory.id 
-              ? { ...cat, ...processedData, updatedAt: new Date().toISOString() }
-              : cat
-          ))
-          setShowFormModal(false)
-          setEditingCategory(null)
-          setFormLoading(false)
-          showSuccess('Categoría actualizada', `La categoría "${processedData.name}" ha sido actualizada exitosamente`)
-        }, 1000)
+        await updateCategoryMutation.mutateAsync({
+          categoryId: editingCategory.id,
+          name: categoryData.name,
+          categoryImage: categoryData.image instanceof File ? categoryData.image : undefined
+        })
+        showSuccess('Categoría actualizada', `La categoría "${categoryData.name}" ha sido actualizada exitosamente`)
       } else {
         // Crear nueva categoría
-        console.log('Creando nueva categoría:', processedData)
+        if (!categoryData.image || typeof categoryData.image === 'string') {
+          showError('Error al guardar', 'Debes seleccionar una imagen para la categoría')
+          return
+        }
         
-        // Simular operación
-        setTimeout(() => {
-          const newCategory: BusinessCategory = {
-            id: `new-${Date.now()}`,
-            ...processedData,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            deletedAt: null
-          }
-          setCategories(prev => [newCategory, ...prev])
-          setShowFormModal(false)
-          setFormLoading(false)
-          showSuccess('Categoría creada', `La categoría "${processedData.name}" ha sido creada exitosamente`)
-        }, 1000)
+        await createCategoryMutation.mutateAsync({
+          name: categoryData.name,
+          categoryImage: categoryData.image
+        })
+        showSuccess('Categoría creada', `La categoría "${categoryData.name}" ha sido creada exitosamente`)
       }
-    } catch (error) {
+      
+      setShowFormModal(false)
+      setEditingCategory(null)
+    } catch (error: any) {
       console.error('Error al guardar categoría:', error)
-      setFormLoading(false)
-      showError('Error al guardar', 'No se pudo guardar la categoría. Verifica los datos e inténtalo de nuevo.')
+      showError('Error al guardar', error.message || 'No se pudo guardar la categoría. Verifica los datos e inténtalo de nuevo.')
     }
   }
 
@@ -187,6 +129,21 @@ function BusinessCategoriesList() {
   const handleRowClick = (category: BusinessCategory) => {
     console.log('Clicked category:', category.name)
     // Aquí podrías navegar a la página de detalles de la categoría
+  }
+
+  // Determinar el estado de loading
+  const formLoading = createCategoryMutation.isPending || updateCategoryMutation.isPending
+
+  // Manejar estados de error
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-red-600 mb-2">Error al cargar las categorías de negocio</p>
+          <p className="text-gray-500 text-sm">{error.message}</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -203,7 +160,6 @@ function BusinessCategoriesList() {
           size="md"
           className="flex items-center gap-2"
         >
-         
           Nueva Categoría
         </Button>
       </div>
@@ -216,13 +172,11 @@ function BusinessCategoriesList() {
         filters={searchFilters}
       />
 
-
-
       {/* Table */}
       <Table
         data={filteredCategories}
         columns={columns}
-        loading={loading}
+        loading={isLoading}
         emptyMessage="No hay categorías de negocio registradas"
         onRowClick={handleRowClick}
         pagination={paginationConfig}

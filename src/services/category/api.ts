@@ -2,11 +2,12 @@ import type {
   ApiResponse, 
   BusinessCategoryListResponse, 
   ProductCategoryListResponse,
+  BusinessCategory,
   CreateCategoryRequest,
   UpdateCategoryRequest
 } from '../../types/Category'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 // ========== FUNCIONES DE FETCH PARA CATEGORÍAS DE NEGOCIOS ==========
 
@@ -20,6 +21,22 @@ export const fetchBusinessCategories = async (token: string): Promise<ApiRespons
 
   if (!response.ok) {
     throw new Error(`Error al obtener categorías de negocios: ${response.statusText}`)
+  }
+
+  return response.json()
+}
+
+// Función para obtener una categoría de negocio específica por ID
+export const fetchBusinessCategoryById = async (token: string, categoryId: string): Promise<ApiResponse<{ businessCategory: BusinessCategory }>> => {
+  const response = await fetch(`${API_URL}/business/category?id=${categoryId}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Error al obtener categoría de negocio: ${response.statusText}`)
   }
 
   return response.json()
@@ -80,7 +97,6 @@ export const deleteBusinessCategory = async (
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
     },
   })
 
@@ -163,7 +179,6 @@ export const deleteProductCategory = async (
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
     },
   })
 

@@ -1,15 +1,15 @@
-import { useRef, useEffect } from "react";
-import Button from "./Button";
+import * as Dialog from '@radix-ui/react-dialog'
+import Button from "./Button"
 
 interface AreYouSureModalProps {
-	isOpen: boolean;
-	onClose: () => void;
-	onConfirm: () => void;
-	message: string;
-	title?: string;
-	confirmText?: string;
-	cancelText?: string;
-	isLoading?: boolean;
+	isOpen: boolean
+	onClose: () => void
+	onConfirm: () => void
+	message: string
+	title?: string
+	confirmText?: string
+	cancelText?: string
+	isLoading?: boolean
 }
 
 export default function AreYouSureModal({
@@ -22,88 +22,45 @@ export default function AreYouSureModal({
 	cancelText = "Cancelar",
 	isLoading = false,
 }: AreYouSureModalProps) {
-	const modalRef = useRef<HTMLDialogElement>(null);
-
-	useEffect(() => {
-		const modalElement = modalRef.current;
-		if (modalElement) {
-			if (isOpen) {
-				if (!modalElement.open) {
-					modalElement.showModal();
-					document.body.classList.add("overflow-hidden");
-				}
-			} else {
-				if (modalElement.open) {
-					modalElement.close();
-				}
-			}
-		}
-
-		return () => {
-			if (document.body.classList.contains("overflow-hidden")) {
-				document.body.classList.remove("overflow-hidden");
-			}
-			if (modalElement?.open) {
-				modalElement.close();
-			}
-		};
-	}, [isOpen]);
-
-	useEffect(() => {
-		const modalElement = modalRef.current;
-		const handleDialogClose = () => {
-			if (isOpen) {
-				onClose();
-				document.body.classList.remove("overflow-hidden");
-			}
-		};
-
-		modalElement?.addEventListener("close", handleDialogClose);
-
-		return () => {
-			modalElement?.removeEventListener("close", handleDialogClose);
-			if (document.body.classList.contains("overflow-hidden")) {
-			}
-		};
-	}, [onClose, isOpen]);
-
 	const handleConfirm = () => {
 		if (!isLoading) {
-			onConfirm();
+			onConfirm()
 		}
-	};
+	}
 
 	return (
-		<>
-			{isOpen && (
-				<div className="fixed inset-0 flex items-center justify-center z-40 bg-black/50" />
-			)}
-			<dialog
-				ref={modalRef}
-				className="p-6 rounded-lg shadow-xl max-w-xs w-full mx-auto self-center z-50"
-			>
-				<h3 className="text-lg font-semibold mb-4">{title}</h3>
-				<p className="text-sm text-gray-600 mb-6">{message}</p>
-				<div className="flex justify-end gap-3">
-					<Button
-						onClick={onClose}
-						variant="secondary"
-						size="md"
-						isDisabled={isLoading}
-					>
-						{cancelText}
-					</Button>
-					<Button
-						onClick={handleConfirm}
-						variant="danger"
-						size="md"
-						isLoading={isLoading}
-						isDisabled={isLoading}
-					>
-						{confirmText}
-					</Button>
-				</div>
-			</dialog>
-		</>
-	);
+		<Dialog.Root open={isOpen} onOpenChange={onClose}>
+			<Dialog.Portal>
+				<Dialog.Overlay className="fixed inset-0 z-40 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+				<Dialog.Content className="fixed left-[50%] top-[50%] z-50 w-full max-w-xs translate-x-[-50%] translate-y-[-50%] rounded-lg bg-white p-6 shadow-xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
+					<Dialog.Title className="text-lg font-semibold mb-4">
+						{title}
+					</Dialog.Title>
+					<Dialog.Description className="text-sm text-gray-600 mb-6">
+						{message}
+					</Dialog.Description>
+					<div className="flex justify-end gap-3">
+						<Dialog.Close asChild>
+							<Button
+								variant="secondary"
+								size="md"
+								isDisabled={isLoading}
+							>
+								{cancelText}
+							</Button>
+						</Dialog.Close>
+						<Button
+							onClick={handleConfirm}
+							variant="danger"
+							size="md"
+							isLoading={isLoading}
+							isDisabled={isLoading}
+						>
+							{confirmText}
+						</Button>
+					</div>
+				</Dialog.Content>
+			</Dialog.Portal>
+		</Dialog.Root>
+	)
 }

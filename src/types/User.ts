@@ -22,4 +22,19 @@ export interface User {
   subscriptions: UserSubscription[]
 }
 
-export type UserRole = User['role'] 
+export type UserRole = User['role']
+
+// Interfaces para respuestas de la API
+export interface ApiResponse<T> {
+  status: 'success' | 'error'
+  data: T
+  message?: string
+}
+
+export interface UserListResponse {
+  users: User[]
+  total: number
+  page: number
+  limit: number
+}
+

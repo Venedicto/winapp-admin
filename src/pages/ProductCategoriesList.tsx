@@ -1,55 +1,28 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import Table, { usePagination } from '../components/ui/Table'
 import { SearchWithFilters } from '../components/ui/Search'
 import type { ProductCategory } from '../types/Category'
-import { CategoryStats, CategoryFormModal } from '../components/category'
+import { CategoryFormModal } from '../components/category'
 import { getCategoryTableColumns } from '../utils/categoryTableColumns'
 import { filterCategories, getCategorySearchFilters } from '../utils/categoryFilters'
 import Button from '../components/ui/Button'
 import { useToastHelpers } from '../hooks/useToastHelpers'
-
-// Datos de ejemplo para mostrar la tabla
-const mockProductCategories: ProductCategory[] = [
-  {
-    "id": "13d9343c-98ce-4d22-9668-585618cab2df",
-    "name": "Hamburguesas",
-    "image": "https://pub-309c9385e5fc49408b34f0738fa9f934.r2.dev/categories/Hamburguesas.JPEG",
-    "createdAt": "2024-08-23T16:36:28.013Z",
-    "updatedAt": "2024-12-13T15:35:37.257Z",
-    "deletedAt": null
-  },
-  {
-    "id": "25e8452d-11df-5e33-7779-696719dbc3ea",
-    "name": "Bebidas",
-    "image": "https://pub-309c9385e5fc49408b34f0738fa9f934.r2.dev/categories/bebidas.png",
-    "createdAt": "2024-09-15T10:20:15.456Z",
-    "updatedAt": "2024-12-10T11:22:18.789Z",
-    "deletedAt": null
-  },
-  {
-    "id": "37f9563e-22f0-6f44-8880-707820ecd4fb",
-    "name": "Postres",
-    "image": "https://pub-309c9385e5fc49408b34f0738fa9f934.r2.dev/categories/postres.jpg",
-    "createdAt": "2024-10-05T14:45:22.123Z",
-    "updatedAt": "2024-12-08T16:30:44.567Z",
-    "deletedAt": null
-  },
-  {
-    "id": "49g0674f-33g1-7g55-9991-818931fed5gc",
-    "name": "Pizza",
-    "image": "https://pub-309c9385e5fc49408b34f0738fa9f934.r2.dev/categories/pizza.png",
-    "createdAt": "2024-07-12T09:15:33.789Z",
-    "updatedAt": "2024-12-14T13:45:12.234Z",
-    "deletedAt": null
-  }
-]
+import { 
+  useProductCategories, 
+  useCreateProductCategory, 
+  useUpdateProductCategory, 
+  useDeleteProductCategory 
+} from '../services/category'
 
 function ProductCategoriesList() {
-  const [categories, setCategories] = useState<ProductCategory[]>([])
-  const [loading, setLoading] = useState(true)
+  // Usar las queries y mutations reales
+  const { data: categoriesResponse, isLoading, error } = useProductCategories()
+  const createCategoryMutation = useCreateProductCategory()
+  const updateCategoryMutation = useUpdateProductCategory()
+  const deleteCategoryMutation = useDeleteProductCategory()
+  
   const [showFormModal, setShowFormModal] = useState(false)
   const [editingCategory, setEditingCategory] = useState<ProductCategory | null>(null)
-  const [formLoading, setFormLoading] = useState(false)
   
   const { showSuccess, showError } = useToastHelpers()
   
@@ -64,13 +37,8 @@ function ProductCategoriesList() {
     handlePageSizeChange
   } = usePagination(10)
 
-  useEffect(() => {
-    // Simular carga de datos
-    setTimeout(() => {
-      setCategories(mockProductCategories)
-      setLoading(false)
-    }, 1000)
-  }, [])
+    // Obtener categorías de la respuesta del API
+    const categories = categoriesResponse?.data?.productCategories || []
 
   // Filtrar categorías usando la utilidad
   const filteredCategories = useMemo(() => {
@@ -115,77 +83,43 @@ function ProductCategoriesList() {
 
   const handleDelete = async (categoryId: string) => {
     try {
-      // Aquí iría la llamada a la API para eliminar
-      console.log('Eliminando categoría:', categoryId)
-      
-      // Simular operación
-      setTimeout(() => {
-        setCategories(prev => prev.filter(cat => cat.id !== categoryId))
-        showSuccess('Categoría eliminada', 'La categoría de producto ha sido eliminada exitosamente')
-      }, 500)
-    } catch (error) {
+      await deleteCategoryMutation.mutateAsync({ categoryId })
+      showSuccess('Categoría eliminada', 'La categoría de producto ha sido eliminada exitosamente')
+    } catch (error: any) {
       console.error('Error al eliminar categoría:', error)
-      showError('Error al eliminar', 'No se pudo eliminar la categoría. Inténtalo de nuevo.')
+      showError('Error al eliminar', error.message || 'No se pudo eliminar la categoría. Inténtalo de nuevo.')
     }
   }
 
   const handleSaveCategory = async (categoryData: { name: string; image: string | File | null }) => {
-    setFormLoading(true)
-    
     try {
-      // Simular subida de archivo si es un File
-      let imageUrl = categoryData.image
-      if (categoryData.image instanceof File) {
-        // Simular subida a servidor y obtener URL
-        console.log('Subiendo archivo:', categoryData.image.name)
-        // En una aplicación real, aquí subirías el archivo a tu servidor/CDN
-        imageUrl = `https://pub-309c9385e5fc49408b34f0738fa9f934.r2.dev/categories/${categoryData.image.name}`
-      }
-
-      const processedData = {
-        name: categoryData.name,
-        image: imageUrl as string
-      }
-
       if (editingCategory) {
         // Editar categoría existente
-        console.log('Actualizando categoría:', editingCategory.id, processedData)
-        
-        // Simular operación
-        setTimeout(() => {
-          setCategories(prev => prev.map(cat => 
-            cat.id === editingCategory.id 
-              ? { ...cat, ...processedData, updatedAt: new Date().toISOString() }
-              : cat
-          ))
-          setShowFormModal(false)
-          setEditingCategory(null)
-          setFormLoading(false)
-          showSuccess('Categoría actualizada', `La categoría "${processedData.name}" ha sido actualizada exitosamente`)
-        }, 1000)
+        await updateCategoryMutation.mutateAsync({
+          categoryId: editingCategory.id,
+          name: categoryData.name,
+          categoryImage: categoryData.image instanceof File ? categoryData.image : undefined
+        })
+        showSuccess('Categoría actualizada', `La categoría "${categoryData.name}" ha sido actualizada exitosamente`)
       } else {
         // Crear nueva categoría
-        console.log('Creando nueva categoría:', processedData)
+        if (!categoryData.image || typeof categoryData.image === 'string') {
+          showError('Error al guardar', 'Debes seleccionar una imagen para la categoría')
+          return
+        }
         
-        // Simular operación
-        setTimeout(() => {
-          const newCategory: ProductCategory = {
-            id: `new-${Date.now()}`,
-            ...processedData,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            deletedAt: null
-          }
-          setCategories(prev => [newCategory, ...prev])
-          setShowFormModal(false)
-          setFormLoading(false)
-          showSuccess('Categoría creada', `La categoría "${processedData.name}" ha sido creada exitosamente`)
-        }, 1000)
+        await createCategoryMutation.mutateAsync({
+          name: categoryData.name,
+          categoryImage: categoryData.image
+        })
+        showSuccess('Categoría creada', `La categoría "${categoryData.name}" ha sido creada exitosamente`)
       }
-    } catch (error) {
+      
+      setShowFormModal(false)
+      setEditingCategory(null)
+    } catch (error: any) {
       console.error('Error al guardar categoría:', error)
-      setFormLoading(false)
-      showError('Error al guardar', 'No se pudo guardar la categoría. Verifica los datos e inténtalo de nuevo.')
+      showError('Error al guardar', error.message || 'No se pudo guardar la categoría. Verifica los datos e inténtalo de nuevo.')
     }
   }
 
@@ -195,6 +129,21 @@ function ProductCategoriesList() {
   const handleRowClick = (category: ProductCategory) => {
     console.log('Clicked category:', category.name)
     // Aquí podrías navegar a la página de detalles de la categoría
+  }
+
+  // Determinar el estado de loading
+  const formLoading = createCategoryMutation.isPending || updateCategoryMutation.isPending
+
+  // Manejar estados de error
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-red-600 mb-2">Error al cargar las categorías de producto</p>
+          <p className="text-gray-500 text-sm">{error.message}</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -223,13 +172,11 @@ function ProductCategoriesList() {
         filters={searchFilters}
       />
 
-    
-
       {/* Table */}
       <Table
         data={filteredCategories}
         columns={columns}
-        loading={loading}
+        loading={isLoading}
         emptyMessage="No hay categorías de producto registradas"
         onRowClick={handleRowClick}
         pagination={paginationConfig}

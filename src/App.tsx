@@ -1,17 +1,18 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { SignedIn, SignedOut } from '@clerk/clerk-react'
+import { Toaster } from 'sonner'
 import LoginForm from './components/forms/LoginForm'
 import DashboardLayout from './components/layout/DashboardLayout'
 import Dashboard from './pages/Dashboard'
 import BusinessList from './pages/BusinessList'
+import BusinessDetail from './pages/BusinessDetail'
 import UserList from './pages/UserList'
 import BusinessCategoriesList from './pages/BusinessCategoriesList'
 import ProductCategoriesList from './pages/ProductCategoriesList'
-import { ToastProvider } from './contexts/ToastContext'
 
 function App() {
   return (
-    <ToastProvider position="top-right">
+    <>
       <Routes>
         {/* Public routes */}
         <Route 
@@ -32,6 +33,7 @@ function App() {
                 <Routes>
                   <Route index element={<Dashboard />} />
                   <Route path="comercios" element={<BusinessList />} />
+                  <Route path="comercios/:id" element={<BusinessDetail />} />
                   <Route path="comercios-pendientes" element={<div>Comercios Pendientes</div>} />
                   <Route path="usuarios" element={<UserList/>} />
                   <Route path="categorias" element={<Navigate to="categorias/negocios" replace />} />
@@ -62,7 +64,8 @@ function App() {
           } 
         />
       </Routes>
-    </ToastProvider>
+      <Toaster position="top-right" />
+    </>
   )
 }
 

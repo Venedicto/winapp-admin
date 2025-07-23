@@ -38,6 +38,12 @@ export const getBusinessTableColumns = (): TableColumn<Business>[] => [
     )
   },
   {
+    key: 'status',
+    title: 'Estado',
+    width: '10%',
+    render: (status: string) => <StatusBadge status={status} />
+  },
+  {
     key: 'address',
     title: 'Dirección',
     width: '30%',
@@ -65,12 +71,6 @@ export const getBusinessTableColumns = (): TableColumn<Business>[] => [
         {userId.replace('user_', '').substring(0, 12)}...
       </div>
     )
-  },
-  {
-    key: 'status',
-    title: 'Estado',
-    width: '10%',
-    render: (status: string) => <StatusBadge status={status} />
   },
   {
     key: 'actions',

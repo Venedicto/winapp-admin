@@ -2,7 +2,7 @@
 export * from './api'
 
 // Queries
-export { useBusinesses, useBusinessDocuments } from './querys'
+export { useBusinesses, useBusinessDocuments, useBusinessById } from './querys'
 
 // Mutations  
-export { useUpdateBusinessStatus, useUpdateDocumentStatus } from './mutations' 
+export { useUpdateBusinessStatus, useUpdateDocumentStatus, useDeleteBusiness } from './mutations' 

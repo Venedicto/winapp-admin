@@ -5,8 +5,7 @@ import type {
   UpdateDocumentStatusRequest,
   ApiResponse
 } from '../../types/Business'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+import { updateBusinessStatus, updateDocumentStatus, deleteBusiness } from './api'
 
 // Hook para actualizar el estado de un negocio
 export const useUpdateBusinessStatus = () => {
@@ -14,27 +13,32 @@ export const useUpdateBusinessStatus = () => {
   const queryClient = useQueryClient()
 
   return useMutation<ApiResponse<string>, Error, { businessId: string } & UpdateBusinessStatusRequest>({
-    mutationFn: async ({ businessId, status }) => {
+    mutationFn: async ({ businessId, status, reason }) => {
       const token = await getToken()
-      
-      const response = await fetch(`${API_URL}/business/status?id=${businessId}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status }),
-      })
-
-      if (!response.ok) {
-        throw new Error(`Error al actualizar estado del negocio: ${response.statusText}`)
+      const requestData: UpdateBusinessStatusRequest = { status }
+      if (reason) {
+        requestData.reason = reason
       }
-
-      return response.json()
+      return updateBusinessStatus(token!, businessId, requestData)
     },
-    onSuccess: () => {
-      // Invalidar y refrescar la lista de negocios
+    onSuccess: async (data, variables) => {
+      // 1. Invalidar y refrescar la query específica del business por ID (PRIORITARIO)
+      await queryClient.invalidateQueries({ 
+        queryKey: ['business', variables.businessId],
+        refetchType: 'active' // Solo refetch de queries activas
+      })
+      
+      // 2. Invalidar la lista general de negocios
       queryClient.invalidateQueries({ queryKey: ['businesses'] })
+      
+      // 3. Invalidar todas las queries de business relacionadas
+      queryClient.invalidateQueries({ queryKey: ['business'] })
+      
+      // 4. Refetch inmediato de la query específica si está activa
+      queryClient.refetchQueries({
+        queryKey: ['business', variables.businessId],
+        type: 'active'
+      })
     },
     onError: (error) => {
       console.error('Error al actualizar estado del negocio:', error)
@@ -50,21 +54,7 @@ export const useUpdateDocumentStatus = () => {
   return useMutation<ApiResponse<string>, Error, { documentId: string } & UpdateDocumentStatusRequest>({
     mutationFn: async ({ documentId, status }) => {
       const token = await getToken()
-      
-      const response = await fetch(`${API_URL}/business/document/status?id=${documentId}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status }),
-      })
-
-      if (!response.ok) {
-        throw new Error(`Error al actualizar estado del documento: ${response.statusText}`)
-      }
-
-      return response.json()
+      return updateDocumentStatus(token!, documentId, { status })
     },
     onSuccess: () => {
       // Invalidar y refrescar la lista de documentos
@@ -72,6 +62,27 @@ export const useUpdateDocumentStatus = () => {
     },
     onError: (error) => {
       console.error('Error al actualizar estado del documento:', error)
+    }
+  })
+}
+
+// Hook para eliminar un negocio
+export const useDeleteBusiness = () => {
+  const { getToken } = useAuth()
+  const queryClient = useQueryClient()
+
+  return useMutation<ApiResponse<string>, Error, { businessId: string }>({
+    mutationFn: async ({ businessId }) => {
+      const token = await getToken()
+      return deleteBusiness(token!, businessId)
+    },
+    onSuccess: () => {
+      // Invalidar y refrescar todas las queries relacionadas con businesses
+      queryClient.invalidateQueries({ queryKey: ['businesses'] })
+      queryClient.invalidateQueries({ queryKey: ['business'] })
+    },
+    onError: (error) => {
+      console.error('Error al eliminar negocio:', error)
     }
   })
 } 

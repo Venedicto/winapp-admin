@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@clerk/clerk-react'
-import { fetchBusinesses, fetchBusinessDocuments } from './api'
+import { fetchBusinesses, fetchBusinessDocuments, fetchBusinessById } from './api'
 import type { 
   ApiResponse, 
   BusinessListResponse, 
-  DocumentListResponse
+  DocumentListResponse,
+  Business
 } from '../../types/Business'
 
 // Hook para obtener todos los negocios
@@ -32,5 +33,20 @@ export const useBusinessDocuments = () => {
       return fetchBusinessDocuments(token!)
     },
     staleTime: 5 * 60 * 1000, // 5 minutos
+  })
+}
+
+// Hook para obtener un comercio específico por ID
+export const useBusinessById = (businessId: string) => {
+  const { getToken } = useAuth()
+
+  return useQuery<ApiResponse<{ business: Business }>>({
+    queryKey: ['business', businessId],
+    queryFn: async () => {
+      const token = await getToken()
+      return fetchBusinessById(token!, businessId)
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    enabled: !!businessId, // Solo ejecutar si hay businessId
   })
 }

@@ -64,6 +64,7 @@ export interface BusinessDocument {
 // Interfaces para requests
 export interface UpdateBusinessStatusRequest {
   status: BusinessStatus
+  reason?: string // Campo opcional para el motivo, especialmente para rechazos y suspensiones
 }
 
 export interface UpdateDocumentStatusRequest {
@@ -82,5 +83,5 @@ export interface BusinessListResponse {
 }
 
 export interface DocumentListResponse {
-  documents: BusinessDocument[]
+  businessDocs: BusinessDocument[]
 } 

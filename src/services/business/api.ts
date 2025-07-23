@@ -2,12 +2,12 @@ import type {
   ApiResponse, 
   BusinessListResponse, 
   DocumentListResponse,
-  BusinessWithDetails,
+  Business,
   UpdateBusinessStatusRequest,
   UpdateDocumentStatusRequest
 } from '../../types/Business'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 // ========== FUNCIONES DE FETCH PARA BUSINESS ==========
 
@@ -41,6 +41,22 @@ export const fetchBusinessDocuments = async (token: string): Promise<ApiResponse
   return response.json()
 }
 
+// Función para obtener un comercio específico por ID
+export const fetchBusinessById = async (token: string, businessId: string): Promise<ApiResponse<{ business: Business }>> => {
+  const response = await fetch(`${API_URL}/business?id=${businessId}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Error al obtener comercio: ${response.statusText}`)
+  }
+
+  return response.json()
+}
+
 export const updateBusinessStatus = async (
   token: string, 
   businessId: string, 
@@ -52,7 +68,7 @@ export const updateBusinessStatus = async (
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify(data), // Ahora incluye status y reason si está presente
   })
 
   if (!response.ok) {
@@ -78,6 +94,24 @@ export const updateDocumentStatus = async (
 
   if (!response.ok) {
     throw new Error(`Error al actualizar estado del documento: ${response.statusText}`)
+  }
+
+  return response.json()
+}
+
+export const deleteBusiness = async (
+  token: string, 
+  businessId: string
+): Promise<ApiResponse<string>> => {
+  const response = await fetch(`${API_URL}/business?id=${businessId}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Error al eliminar comercio: ${response.statusText}`)
   }
 
   return response.json()

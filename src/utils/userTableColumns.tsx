@@ -78,24 +78,6 @@ export const getUserTableColumns = (): TableColumn<User>[] => [
     }
   },
   {
-    key: 'customerId',
-    title: 'Cliente ID',
-    width: '15%',
-    hideOnMobile: true,
-    hideOnTablet: true,
-    render: (customerId: string | null) => (
-      <div className="text-sm text-gray-900 font-mono">
-        {customerId ? (
-          <span className="bg-gray-100 px-2 py-1 rounded text-xs">
-            {customerId.substring(0, 8)}...
-          </span>
-        ) : (
-          <span className="text-gray-400 text-xs">Sin asignar</span>
-        )}
-      </div>
-    )
-  },
-  {
     key: 'createdAt',
     title: 'Registro',
     width: '10%',

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import * as Dialog from '@radix-ui/react-dialog'
 import type { ReactNode } from 'react'
 
 interface ModalProps {
@@ -9,64 +9,16 @@ interface ModalProps {
 }
 
 export default function Modal({ isOpen, onClose, children, className = '' }: ModalProps) {
-  const modalRef = useRef<HTMLDialogElement>(null)
-
-  // Handle modal open/close
-  useEffect(() => {
-    const modalElement = modalRef.current
-    if (modalElement) {
-      if (isOpen) {
-        if (!modalElement.open) {
-          modalElement.showModal()
-          document.body.classList.add('overflow-hidden')
-        }
-      } else {
-        if (modalElement.open) {
-          modalElement.close()
-        }
-      }
-    }
-
-    return () => {
-      if (document.body.classList.contains('overflow-hidden')) {
-        document.body.classList.remove('overflow-hidden')
-      }
-      if (modalElement?.open) {
-        modalElement.close()
-      }
-    }
-  }, [isOpen])
-
-  useEffect(() => {
-    const modalElement = modalRef.current
-    const handleDialogClose = () => {
-      if (isOpen) {
-        onClose()
-        document.body.classList.remove('overflow-hidden')
-      }
-    }
-
-    modalElement?.addEventListener('close', handleDialogClose)
-
-    return () => {
-      modalElement?.removeEventListener('close', handleDialogClose)
-      if (document.body.classList.contains('overflow-hidden')) {
-        document.body.classList.remove('overflow-hidden')
-      }
-    }
-  }, [onClose, isOpen])
-
-  if (!isOpen) return null
-
   return (
-    <>
-      <div className="fixed inset-0 flex items-center justify-center z-40 bg-black/50" />
-      <dialog
-        ref={modalRef}
-        className={`p-0 rounded-2xl shadow-2xl max-w-md w-full mx-auto self-center z-50 border-0 backdrop:bg-black/50 ${className}`}
-      >
-        {children}
-      </dialog>
-    </>
+    <Dialog.Root open={isOpen} onOpenChange={onClose}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+        <Dialog.Content 
+          className={`fixed left-[50%] top-[50%] z-50 w-full max-w-md translate-x-[-50%] translate-y-[-50%] rounded-2xl border-0 bg-white p-0 shadow-2xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] ${className}`}
+        >
+          {children}
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   )
 } 

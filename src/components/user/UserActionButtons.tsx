@@ -72,13 +72,7 @@ export default function UserActionButtons({
           {/* Dropdown */}
           <div className="absolute right-0 z-20 mt-2 w-64 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 border border-gray-200">
             <div className="py-2">
-              <button
-                onClick={handleEdit}
-                className="group flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-              >
-                <span className="mr-3 text-gray-400 group-hover:text-gray-500">✏️</span>
-                Editar Usuario
-              </button>
+            
               
 
              

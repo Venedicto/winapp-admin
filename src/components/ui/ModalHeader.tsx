@@ -1,3 +1,5 @@
+import * as Dialog from '@radix-ui/react-dialog'
+
 interface ModalHeaderProps {
   title: string
   gradient?: boolean
@@ -11,7 +13,7 @@ export default function ModalHeader({ title, gradient = true }: ModalHeaderProps
 
   return (
     <div className={`${baseClasses} ${gradientClasses}`}>
-      <h2 className="text-xl font-bold">{title}</h2>
+      <Dialog.Title className="text-xl font-bold">{title}</Dialog.Title>
     </div>
   )
 } 
