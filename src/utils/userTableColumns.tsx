@@ -6,7 +6,6 @@ export const getUserTableColumns = (): TableColumn<User>[] => [
   {
     key: 'fullName',
     title: 'Usuario',
-    width: '25%',
     render: (fullName: string, user: User) => (
       <div className="flex items-center space-x-3">
         <div className="flex-shrink-0 h-10 w-10 lg:h-12 lg:w-12">
@@ -23,6 +22,12 @@ export const getUserTableColumns = (): TableColumn<User>[] => [
           <div className="text-xs lg:text-sm text-gray-500 truncate">
             {user.email}
           </div>
+          <div className="flex items-center gap-2 mt-1 lg:hidden">
+            <UserStatusBadge user={user} />
+            <span className="text-xs text-gray-500">
+              {user.subscriptions.filter(sub => sub.active).length}/{user.subscriptions.length} subs
+            </span>
+          </div>
         </div>
       </div>
     )
@@ -30,11 +35,10 @@ export const getUserTableColumns = (): TableColumn<User>[] => [
   {
     key: 'email',
     title: 'Email',
-    width: '20%',
     hideOnMobile: true,
     hideOnTablet: true,
     render: (email: string, user: User) => (
-      <div className="w-full overflow-hidden">
+      <div className="min-w-0">
         <div className="text-sm text-gray-900 truncate">
           {email}
         </div>
@@ -50,29 +54,29 @@ export const getUserTableColumns = (): TableColumn<User>[] => [
   {
     key: 'role',
     title: 'Rol',
-    width: '15%',
     hideOnMobile: true,
     render: (_role: string, user: User) => (
-      <UserStatusBadge user={user} />
+      <div>
+        <UserStatusBadge user={user} />
+      </div>
     )
   },
   {
     key: 'subscriptions',
     title: 'Suscripciones',
-    width: '15%',
     hideOnMobile: true,
     render: (subscriptions: User['subscriptions']) => {
       const activeCount = subscriptions.filter(sub => sub.active).length
-      
+
       return (
         <div className="text-sm">
-          <div className="font-medium text-gray-900">
+          <div className="font-medium text-gray-900 whitespace-nowrap">
             {subscriptions.length} total
           </div>
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-gray-500 whitespace-nowrap">
             {activeCount} activa{activeCount !== 1 ? 's' : ''}
           </div>
-         
+
         </div>
       )
     }
@@ -80,17 +84,16 @@ export const getUserTableColumns = (): TableColumn<User>[] => [
   {
     key: 'createdAt',
     title: 'Registro',
-    width: '10%',
     hideOnMobile: true,
     render: (createdAt: string) => {
       const date = new Date(createdAt)
       return (
         <div className="text-sm text-gray-900">
-          <div>{date.toLocaleDateString('es-ES')}</div>
-          <div className="text-xs text-gray-500">
-            {date.toLocaleTimeString('es-ES', { 
-              hour: '2-digit', 
-              minute: '2-digit' 
+          <div className="whitespace-nowrap">{date.toLocaleDateString('es-ES')}</div>
+          <div className="text-xs text-gray-500 whitespace-nowrap">
+            {date.toLocaleTimeString('es-ES', {
+              hour: '2-digit',
+              minute: '2-digit'
             })}
           </div>
         </div>
@@ -100,17 +103,17 @@ export const getUserTableColumns = (): TableColumn<User>[] => [
   {
     key: 'actions',
     title: 'Acciones',
-    width: '10%',
-    hideOnMobile: true,
     render: (_, user: User) => (
-      <UserActionButtons 
-        user={user}
-        onEdit={(user) => console.log('Editar usuario:', user.id)}
-        onDelete={(user) => console.log('Eliminar usuario:', user.id)}
-        onToggleSubscription={(user) => console.log('Toggle suscripción:', user.id)}
-        onSendEmail={(user) => console.log('Enviar email:', user.email)}
-        onManageCredits={(user) => console.log('Gestionar créditos:', user.id)}
-      />
+      <div>
+        <UserActionButtons
+          user={user}
+          onEdit={(user) => console.log('Editar usuario:', user.id)}
+          onDelete={(user) => console.log('Eliminar usuario:', user.id)}
+          onViewSubscriptions={(user) => console.log('Ver suscripciones:', user.id, user.subscriptions)}
+          onSendEmail={(user) => console.log('Enviar email:', user.email)}
+          onManageCredits={(user) => console.log('Gestionar créditos:', user.id)}
+        />
+      </div>
     )
   }
 ]
@@ -120,7 +123,7 @@ export const getUserMobileColumns = (): TableColumn<User>[] => [
   {
     key: 'fullName',
     title: 'Usuario',
-    width: '70%',
+    width: '80%',
     render: (fullName: string, user: User) => (
       <div className="flex items-center space-x-3">
         <div className="flex-shrink-0 h-10 w-10">
@@ -139,50 +142,29 @@ export const getUserMobileColumns = (): TableColumn<User>[] => [
           </div>
           <div className="flex items-center gap-2 mt-1">
             <UserStatusBadge user={user} />
+            <span className="text-xs text-gray-500">
+              {user.subscriptions.filter(sub => sub.active).length}/{user.subscriptions.length} subs
+            </span>
           </div>
         </div>
       </div>
     )
   },
   {
-    key: 'subscriptions',
-    title: 'Estado',
-    width: '20%',
-    render: (subscriptions: User['subscriptions']) => {
-      const activeCount = subscriptions.filter(sub => sub.active).length
-      const subscriptionsWithCredits = subscriptions.filter(sub => parseInt(sub.credits || '0') > 0)
-      
-      return (
-        <div className="text-right">
-          <div className="text-sm font-medium text-gray-900">
-            {activeCount}/{subscriptions.length}
-          </div>
-          <div className="text-xs text-gray-500">
-            suscripciones
-          </div>
-          {/* Mostrar créditos por suscripción en móvil */}
-          {subscriptionsWithCredits.length > 0 && (
-            <div className="text-xs text-blue-600 font-medium">
-              {subscriptionsWithCredits.length} con 💰
-            </div>
-          )}
-        </div>
-      )
-    }
-  },
-  {
     key: 'actions',
     title: '',
-    width: '10%',
+    width: '20%',
     render: (_, user: User) => (
-      <UserActionButtons 
-        user={user}
-        onEdit={(user) => console.log('Editar usuario:', user.id)}
-        onDelete={(user) => console.log('Eliminar usuario:', user.id)}
-        onToggleSubscription={(user) => console.log('Toggle suscripción:', user.id)}
-        onSendEmail={(user) => console.log('Enviar email:', user.email)}
-        onManageCredits={(user) => console.log('Gestionar créditos:', user.id)}
-      />
+      <div className="flex justify-end">
+        <UserActionButtons
+          user={user}
+          onEdit={(user) => console.log('Editar usuario:', user.id)}
+          onDelete={(user) => console.log('Eliminar usuario:', user.id)}
+          onViewSubscriptions={(user) => console.log('Ver suscripciones:', user.id, user.subscriptions)}
+          onSendEmail={(user) => console.log('Enviar email:', user.email)}
+          onManageCredits={(user) => console.log('Gestionar créditos:', user.id)}
+        />
+      </div>
     )
   }
 ] 

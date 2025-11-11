@@ -88,14 +88,20 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const location = useLocation()
   const [openSubmenus, setOpenSubmenus] = useState<string[]>([])
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   // Auto-abrir submenús basado en la ruta actual
   useEffect(() => {
     if (location.pathname.startsWith('/dashboard/categorias')) {
-      setOpenSubmenus(prev => 
+      setOpenSubmenus(prev =>
         prev.includes('Categorías') ? prev : [...prev, 'Categorías']
       )
     }
+  }, [location.pathname])
+
+  // Cerrar menú mobile al cambiar de ruta
+  useEffect(() => {
+    setIsMobileMenuOpen(false)
   }, [location.pathname])
 
   const toggleSubmenu = (label: string) => {
@@ -117,8 +123,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-50 flex">
+      {/* Mobile Backdrop */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <div className="w-64 lg:w-80 h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 overflow-hidden flex flex-col fixed left-0 top-0 z-20">
+      <div className={`w-64 lg:w-80 h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 overflow-hidden flex flex-col fixed left-0 top-0 z-40 lg:z-20 transition-transform duration-300 ${
+        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      }`}>
         {/* Background decorative elements */}
         <div className="absolute top-0 left-0 w-full h-full">
           <div className="absolute top-20 left-20 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-pulse"></div>
@@ -128,14 +144,25 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
         {/* Logo */}
         <div className="relative z-10 px-4 lg:px-8 py-4 border-b border-white/20 flex-shrink-0">
-                      <div className="flex items-center space-x-2 lg:space-x-3">
-            <div className="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm flex-shrink-0">
-              <img src="/images/iso.svg" alt="WinApp" className="w-full h-full object-contain" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2 lg:space-x-3">
+              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm flex-shrink-0">
+                <img src="/images/iso.svg" alt="WinApp" className="w-full h-full object-contain" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-white text-lg lg:text-xl font-bold truncate">WinApp</h1>
+                <p className="text-purple-200 text-sm lg:text-md truncate hidden lg:block">Panel administrador</p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <h1 className="text-white text-lg lg:text-xl font-bold truncate">WinApp</h1>
-              <p className="text-purple-200 text-sm lg:text-md truncate hidden lg:block">Panel administrador</p>
-            </div>
+            {/* Botón cerrar para mobile */}
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="lg:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
+            >
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -232,15 +259,23 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
        
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col ml-64 lg:ml-80 w-0">
+      <div className="flex-1 flex flex-col ml-0 lg:ml-80 w-full md:w-0 md:ml-0 ">
         {/* Header */}
         <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 px-4 lg:px-8 py-4 lg:py-6 shadow-sm">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
-            
+              {/* Botón hamburguesa para mobile */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
             </div>
-            
-            <div className="flex items-center space-x-6">          
+
+            <div className="flex items-center space-x-6">
              <UserButton />
             </div>
           </div>

@@ -138,7 +138,7 @@ function Pagination({
   if (total === 0) return null
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 sm:px-6 py-4 bg-gray-50/50 border-t border-gray-200/50">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 sm:px-6 py-4 bg-gray-50/50 border-t border-gray-200/50 max-w-30">
       {/* Información de registros */}
       <div className="flex items-center gap-4">
         <span className="text-sm text-gray-600">
@@ -210,15 +210,15 @@ function Pagination({
   )
 }
 
-// Vista de tarjetas móvil mejorada
-function MobileCardView<T extends Record<string, any>>({ 
-  data, 
-  columns, 
+// Vista de tabla móvil con scroll horizontal
+function MobileCardView<T extends Record<string, any>>({
+  data,
+  columns,
   onRowClick,
   striped = false
-}: { 
-  data: T[], 
-  columns: TableColumn<T>[], 
+}: {
+  data: T[],
+  columns: TableColumn<T>[],
   onRowClick?: (row: T, index: number) => void,
   striped?: boolean
 }) {
@@ -229,44 +229,68 @@ function MobileCardView<T extends Record<string, any>>({
     return row[key as keyof T]
   }
 
-      return (
-      <div className="space-y-4">
-        {data.map((row, rowIndex) => (
-        <div
-          key={rowIndex}
-          className={`group relative overflow-hidden rounded-2xl border border-gray-200/60 bg-white/70 backdrop-blur-sm shadow-sm transition-all duration-300 hover:shadow-lg hover:border-purple-200/80 ${
-            onRowClick ? 'cursor-pointer hover:scale-[1.02] active:scale-[0.98]' : ''
-          } ${striped && rowIndex % 2 === 1 ? 'bg-gray-50/50' : ''}`}
-          onClick={() => onRowClick?.(row, rowIndex)}
-        >
-          {/* Efecto de brillo al hover */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-          
-          <div className="relative p-4 sm:p-5">
+  return (
+    <div className="w-full overflow-x-auto -mx-4 px-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+      <table className="w-full table-auto">
+        <thead>
+          <tr className="bg-gradient-to-r from-gray-50/90 to-gray-100/80 backdrop-blur-sm">
             {columns
               .filter(column => !column.hideOnMobile)
-              .map((column, colIndex) => {
-                const value = getValue(row, column.key)
-                const content = column.render ? column.render(value, row, rowIndex) : value
+              .map((column, index) => {
                 const alignment = column.align || 'left'
-                
+                const alignmentClass = alignment === 'center' ? 'text-center' :
+                                    alignment === 'right' ? 'text-right' : 'text-left'
+
                 return (
-                  <div key={colIndex} className={`flex items-center justify-between py-2 ${colIndex === 0 ? 'pt-0' : ''} ${colIndex === columns.filter(c => !c.hideOnMobile).length - 1 ? 'pb-0' : 'border-b border-gray-100/50'}`}>
-                    <span className="text-sm font-medium text-gray-600 min-w-0 flex-shrink-0 mr-4">
-                      {column.title}
-                    </span>
-                    <span className={`text-sm text-gray-900 min-w-0 font-medium ${
-                      alignment === 'center' ? 'text-center' : 
-                      alignment === 'right' ? 'text-right' : 'text-left'
-                    }`}>
-                      {content}
-                    </span>
-                  </div>
+                  <th
+                    key={index}
+                    className={`px-3 py-3 ${alignmentClass} text-xs font-bold text-gray-700 uppercase tracking-wider whitespace-nowrap border-b border-gray-200/50`}
+                  >
+                    <span>{column.title}</span>
+                  </th>
                 )
               })}
-          </div>
-        </div>
-      ))}
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row, rowIndex) => (
+            <tr
+              key={rowIndex}
+              className={`group transition-all duration-200 hover:bg-gradient-to-r hover:from-purple-50/60 hover:to-blue-50/40 ${
+                striped && rowIndex % 2 === 1 ? 'bg-gray-50/30' : ''
+              } ${
+                onRowClick ? 'cursor-pointer' : ''
+              }`}
+              onClick={() => onRowClick?.(row, rowIndex)}
+            >
+              {columns
+                .filter(column => !column.hideOnMobile)
+                .map((column, colIndex) => {
+                  const value = getValue(row, column.key)
+                  const content = column.render ? column.render(value, row, rowIndex) : value
+
+                  const alignment = column.align || 'left'
+                  const alignmentClass = alignment === 'center' ? 'text-center' :
+                                      alignment === 'right' ? 'text-right' : 'text-left'
+
+                  return (
+                    <td
+                      key={colIndex}
+                      className={`px-3 py-3 text-sm text-gray-900 ${alignmentClass} ${
+                        rowIndex < data.length - 1 ? 'border-b border-gray-200/30' : ''
+                      }`}
+                      style={{ whiteSpace: 'nowrap' }}
+                    >
+                      <div className="font-medium transition-colors group-hover:text-gray-800">
+                        {content}
+                      </div>
+                    </td>
+                  )
+                })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }
@@ -435,12 +459,12 @@ export default function Table<T extends Record<string, any>>({
 
   return (
     <div className={`rounded-3xl shadow-xl border-2 border-white/60 overflow-hidden transition-all duration-300 hover:shadow-2xl ${className}`}>
-      {/* Vista de tarjetas para móvil */}
+      {/* Vista mobile con scroll horizontal */}
       {mobileCardView && (
-        <div className="block lg:hidden p-4 sm:p-6">
-          <MobileCardView 
-            data={displayData} 
-            columns={columns} 
+        <div className="block lg:hidden">
+          <MobileCardView
+            data={displayData}
+            columns={columns}
             onRowClick={onRowClick}
             striped={striped}
           />
@@ -448,8 +472,8 @@ export default function Table<T extends Record<string, any>>({
       )}
 
       {/* Vista de tabla para desktop */}
-      <div className={`${mobileCardView ? 'hidden lg:block' : 'block'} w-full overflow-scroll`}>
-        <table className="w-full min-w-full table-auto">
+      <div className={`${mobileCardView ? 'hidden lg:block' : 'block'} w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100`}>
+        <table className="w-full table-auto">
           <thead>
             <tr className="bg-gradient-to-r from-gray-50/90 to-gray-100/80 backdrop-blur-sm">
               {columns.map((column, index) => {
@@ -459,7 +483,7 @@ export default function Table<T extends Record<string, any>>({
                 ].filter(Boolean).join(' ')
 
                 const alignment = column.align || 'left'
-                const alignmentClass = alignment === 'center' ? 'text-center' : 
+                const alignmentClass = alignment === 'center' ? 'text-center' :
                                     alignment === 'right' ? 'text-right' : 'text-left'
 
                 return (
@@ -495,22 +519,23 @@ export default function Table<T extends Record<string, any>>({
                 {columns.map((column, colIndex) => {
                   const value = getValue(row, column.key)
                   const content = column.render ? column.render(value, row, rowIndex) : value
-                  
+
                   const responsiveClasses = [
                     column.hideOnMobile ? 'hidden sm:table-cell' : '',
                     column.hideOnTablet ? 'hidden lg:table-cell' : ''
                   ].filter(Boolean).join(' ')
 
                   const alignment = column.align || 'left'
-                  const alignmentClass = alignment === 'center' ? 'text-center' : 
+                  const alignmentClass = alignment === 'center' ? 'text-center' :
                                       alignment === 'right' ? 'text-right' : 'text-left'
-                  
+
                   return (
                     <td
                       key={colIndex}
-                      className={`px-4 lg:px-6 py-3 lg:py-4 text-sm lg:text-base text-gray-900 ${alignmentClass} ${column.className || ''} ${responsiveClasses} ${compact ? 'py-2 lg:py-3' : ''} whitespace-nowrap ${
+                      className={`px-4 lg:px-6 py-3 lg:py-4 text-sm lg:text-base text-gray-900 ${alignmentClass} ${column.className || ''} ${responsiveClasses} ${compact ? 'py-2 lg:py-3' : ''} ${
                         rowIndex < displayData.length - 1 ? 'border-b border-gray-200/30' : ''
                       }`}
+                      style={{ whiteSpace: 'nowrap' }}
                     >
                       <div className="font-medium transition-colors group-hover:text-gray-800">
                         {content}
@@ -524,13 +549,13 @@ export default function Table<T extends Record<string, any>>({
         </table>
       </div>
       {pagination && (
-        <Pagination 
-          currentPage={pagination.currentPage} 
-          pageSize={pagination.pageSize} 
-          total={pagination.total} 
-          onPageChange={pagination.onPageChange} 
-          onPageSizeChange={pagination.onPageSizeChange} 
-          showSizeChanger={pagination.showSizeChanger} 
+        <Pagination
+          currentPage={pagination.currentPage}
+          pageSize={pagination.pageSize}
+          total={pagination.total}
+          onPageChange={pagination.onPageChange}
+          onPageSizeChange={pagination.onPageSizeChange}
+          showSizeChanger={pagination.showSizeChanger}
           pageSizeOptions={pagination.pageSizeOptions}
         />
       )}

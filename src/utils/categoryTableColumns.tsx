@@ -10,7 +10,6 @@ export const getCategoryTableColumns = (
   {
     key: 'image',
     title: 'Imagen',
-    width: '15%',
     hideOnMobile: true,
     render: (image: string, category: BusinessCategory | ProductCategory) => (
       <div className="flex-shrink-0 h-12 w-12 lg:h-16 lg:w-16">
@@ -29,10 +28,9 @@ export const getCategoryTableColumns = (
   {
     key: 'name',
     title: 'Nombre',
-    width: '35%',
     sortable: true,
     render: (name: string, category: BusinessCategory | ProductCategory) => (
-      <div className="w-full overflow-hidden">
+      <div className="min-w-0">
         <div className="text-sm lg:text-base font-semibold text-gray-900 truncate">
           {name}
         </div>
@@ -45,7 +43,6 @@ export const getCategoryTableColumns = (
   {
     key: 'createdAt',
     title: 'Fecha de Creación',
-    width: '20%',
     hideOnMobile: true,
     sortable: true,
     render: (createdAt: string) => {
@@ -66,7 +63,6 @@ export const getCategoryTableColumns = (
   {
     key: 'updatedAt',
     title: 'Última Actualización',
-    width: '20%',
     hideOnMobile: true,
     hideOnTablet: true,
     sortable: true,
@@ -89,11 +85,9 @@ export const getCategoryTableColumns = (
   {
     key: 'actions',
     title: 'Acciones',
-    width: '10%',
-    hideOnMobile: true,
     render: (_, category: BusinessCategory | ProductCategory) => (
-      <CategoryActionButtons 
-        category={category} 
+      <CategoryActionButtons
+        category={category}
         type={type}
         onEdit={onEdit}
         onDelete={onDelete}

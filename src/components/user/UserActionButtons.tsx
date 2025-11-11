@@ -1,84 +1,72 @@
 import { useState } from 'react'
+import { toast } from 'sonner'
 import type { User } from '../../types/User'
+import { DeleteButton, AreYouSureModal } from '../ui'
 
 interface UserActionButtonsProps {
   user: User
   onEdit?: (user: User) => void
   onDelete?: (user: User) => void
-  onToggleSubscription?: (user: User) => void
+  onViewSubscriptions?: (user: User) => void
   onSendEmail?: (user: User) => void
   onManageCredits?: (user: User) => void
 }
 
-export default function UserActionButtons({ 
-  user, 
-  onDelete, 
-
+export default function UserActionButtons({
+  user,
+  onDelete,
+  onViewSubscriptions,
 }: UserActionButtonsProps) {
-  const [isOpen, setIsOpen] = useState(false)
-
-
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   const handleDelete = () => {
-    if (window.confirm(`¿Estás seguro de que deseas eliminar al usuario ${user.fullName}?`)) {
-      onDelete?.(user)
-    }
-    setIsOpen(false)
+    setShowDeleteModal(true)
   }
 
+  const confirmDelete = () => {
+    onDelete?.(user)
+    setShowDeleteModal(false)
+  }
 
+  const handleViewSubscriptions = () => {
+    if (!user.subscriptions || user.subscriptions.length === 0) {
+      toast.info('Este usuario no tiene suscripciones')
+      return
+    }
+    onViewSubscriptions?.(user)
+  }
 
   return (
-    <div className="relative inline-block text-left">
+    <div className="flex items-center gap-2">
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="inline-flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+        onClick={handleViewSubscriptions}
+        className="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-colors"
+        title={`Ver suscripciones (${user.subscriptions.length})`}
       >
-        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
         </svg>
       </button>
 
-      {isOpen && (
-        <>
-          {/* Overlay */}
-          <div 
-            className="fixed inset-0 z-10" 
-            onClick={() => setIsOpen(false)}
-          />
-          
-          {/* Dropdown */}
-          <div className="absolute right-0 z-20 mt-2 w-64 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 border border-gray-200">
-            <div className="py-2">
-            
-              
+      <DeleteButton
+        onClick={handleDelete}
+        title="Eliminar usuario"
+      />
 
-             
-              
-              <button
-                onClick={() => {
-                  console.log('Ver suscripciones del usuario:', user.id)
-                  setIsOpen(false)
-                }}
-                className="group flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-              >
-                <span className="mr-3 text-gray-400 group-hover:text-gray-500">📋</span>
-                Ver Suscripciones ({user.subscriptions.length})
-              </button>
-
-              <div className="border-t border-gray-100 my-1" />
-              
-              <button
-                onClick={handleDelete}
-                className="group flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
-              >
-                <span className="mr-3 text-red-400 group-hover:text-red-500">🗑️</span>
-                Eliminar Usuario
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+      <AreYouSureModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
+        title="Eliminar Usuario"
+        message={`¿Estás seguro de que deseas eliminar al usuario ${user.fullName}? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+      />
     </div>
   )
 } 

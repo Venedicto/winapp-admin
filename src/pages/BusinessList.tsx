@@ -113,7 +113,7 @@ function BusinessList() {
   }
 
   return (
-    <div className="space-y-8 bg-white">
+    <div className="space-y-8 bg-white overflow-hidden">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
