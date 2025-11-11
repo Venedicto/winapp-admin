@@ -1,15 +1,31 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import Table from '../components/ui/Table'
+import Button from '../components/ui/Button'
 import { SearchWithFilters } from '../components/ui/Search'
+import CategoryFormModal from '../components/category/CategoryFormModal'
 import { getCategoryTableColumns } from '../utils/categoryTableColumns'
 import { filterCategories } from '../utils/categoryFilters'
 import { useCategoryFilters } from '../hooks/useCategoryFilters'
-import { useBusinessCategories } from '../services/category'
+import {
+  useBusinessCategories,
+  useCreateBusinessCategory,
+  useUpdateBusinessCategory,
+  useDeleteBusinessCategory
+} from '../services/category'
+import type { BusinessCategory } from '../types/Category'
 
 function BusinessCategoriesList() {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<BusinessCategory | null>(null)
+
   // Usar las queries reales
   const { data: categoriesResponse, isLoading, error } = useBusinessCategories()
-  
+  const createCategoryMutation = useCreateBusinessCategory()
+  const updateCategoryMutation = useUpdateBusinessCategory()
+  const deleteCategoryMutation = useDeleteBusinessCategory()
+
   // Hook de filtros con query parameters
   const {
     search,
@@ -61,6 +77,53 @@ function BusinessCategoriesList() {
     return sortedCategories.slice(startIndex, endIndex)
   }, [sortedCategories, page, pageSize])
 
+  // Manejar creación de categoría
+  const handleCreateCategory = async (categoryData: { name: string; image: string | File | null }) => {
+    try {
+      await createCategoryMutation.mutateAsync({
+        name: categoryData.name,
+        categoryImage: categoryData.image as File
+      })
+      toast.success('Categoría creada exitosamente')
+      setIsCreateModalOpen(false)
+    } catch (error) {
+      toast.error('Error al crear la categoría')
+    }
+  }
+
+  // Manejar edición de categoría
+  const handleEditCategory = (category: BusinessCategory) => {
+    setSelectedCategory(category)
+    setIsEditModalOpen(true)
+  }
+
+  const handleUpdateCategory = async (categoryData: { name: string; image: string | File | null }) => {
+    if (!selectedCategory) return
+
+    try {
+      await updateCategoryMutation.mutateAsync({
+        categoryId: selectedCategory.id,
+        name: categoryData.name,
+        categoryImage: categoryData.image instanceof File ? categoryData.image : undefined
+      })
+      toast.success('Categoría actualizada exitosamente')
+      setIsEditModalOpen(false)
+      setSelectedCategory(null)
+    } catch (error) {
+      toast.error('Error al actualizar la categoría')
+    }
+  }
+
+  // Manejar eliminación de categoría
+  const handleDeleteCategory = async (categoryId: string) => {
+    try {
+      await deleteCategoryMutation.mutateAsync({ categoryId })
+      toast.success('Categoría eliminada exitosamente')
+    } catch (error) {
+      toast.error('Error al eliminar la categoría')
+    }
+  }
+
   // Configuración de paginación
   const paginationConfig = {
     currentPage: page,
@@ -73,7 +136,7 @@ function BusinessCategoriesList() {
   }
 
   // Obtener columnas de la tabla con ordenamiento
-  const columns = getCategoryTableColumns('business').map(column => ({
+  const columns = getCategoryTableColumns('business', handleEditCategory, handleDeleteCategory).map(column => ({
     ...column,
     sortable: true,
     onSort: column.sortable ? () => toggleSort(column.key as string) : undefined,
@@ -103,14 +166,19 @@ function BusinessCategoriesList() {
             {hasActiveFilters && ' (filtradas)'}
           </p>
         </div>
-        {hasActiveFilters && (
-          <button
-            onClick={clearAllFilters}
-            className="px-4 py-2 text-sm text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-colors"
-          >
-            Limpiar filtros
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          {hasActiveFilters && (
+            <button
+              onClick={clearAllFilters}
+              className="px-4 py-2 text-sm text-purple-600 hover:text-purple-800 hover:bg-purple-50 rounded-lg transition-colors"
+            >
+              Limpiar filtros
+            </button>
+          )}
+          <Button onClick={() => setIsCreateModalOpen(true)}>
+            + Nueva Categoría
+          </Button>
+        </div>
       </div>
 
       {/* Search */}
@@ -119,12 +187,12 @@ function BusinessCategoriesList() {
         initialSearchValue={search}
         onSearch={(query) => setSearch(query || null)}
         onReset={clearAllFilters}
-        filters={[]} // Sin filtros específicos por ahora
+        filters={[]}
       />
 
       {/* Table con paginación y ordenamiento desde URL */}
       <Table
-        data={paginatedCategories} // Solo los datos de la página actual
+        data={paginatedCategories}
         columns={columns}
         loading={isLoading}
         emptyMessage="No hay categorías registradas"
@@ -132,6 +200,28 @@ function BusinessCategoriesList() {
         mobileCardView={true}
         striped={true}
         hover={true}
+      />
+
+      {/* Modal de creación */}
+      <CategoryFormModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSave={handleCreateCategory}
+        type="business"
+        isLoading={createCategoryMutation.isPending}
+      />
+
+      {/* Modal de edición */}
+      <CategoryFormModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false)
+          setSelectedCategory(null)
+        }}
+        onSave={handleUpdateCategory}
+        category={selectedCategory}
+        type="business"
+        isLoading={updateCategoryMutation.isPending}
       />
     </div>
   )

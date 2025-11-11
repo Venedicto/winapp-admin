@@ -1,4 +1,5 @@
 import type { Notification, CreateNotificationRequest, NotificationStats, ApiResponse } from '../../types/Notification'
+import { handleEmptyListResponse } from '../../utils/apiHelpers'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -13,17 +14,19 @@ export const fetchNotifications = async (token: string): Promise<Notification[]>
     },
   })
 
-  if (!response.ok) {
-    throw new Error(`Error al obtener notificaciones: ${response.statusText}`)
-  }
+  const responseData = await handleEmptyListResponse<ApiResponse<{notifications: Notification[]}>>(
+    response,
+    { status: 'success', data: { notifications: [] } } as ApiResponse<{notifications: Notification[]}>
+  )
 
-  const responseData = await response.json() as ApiResponse<{notifications: Notification[]}>
-  if(responseData.status === "error"){
+  if (responseData.status === "error") {
     throw new Error(responseData.message)
   }
-  if(Object.keys(responseData.data).includes("message")){
+
+  if (Object.keys(responseData.data).includes("message")) {
     return []
   }
+
   return responseData.data.notifications
 }
 

@@ -8,4 +8,7 @@ export * from './userFilters'
 
 // Re-export todas las utilidades de Category
 export * from './categoryTableColumns'
-export * from './categoryFilters' 
+export * from './categoryFilters'
+
+// Re-export utilidades de API
+export * from './apiHelpers' 

@@ -54,9 +54,9 @@ export const getCategoryTableColumns = (
         <div className="text-sm text-gray-900">
           <div>{date.toLocaleDateString('es-ES')}</div>
           <div className="text-xs text-gray-500">
-            {date.toLocaleTimeString('es-ES', { 
-              hour: '2-digit', 
-              minute: '2-digit' 
+            {date.toLocaleTimeString('es-ES', {
+              hour: '2-digit',
+              minute: '2-digit'
             })}
           </div>
         </div>
@@ -75,7 +75,7 @@ export const getCategoryTableColumns = (
       const now = new Date()
       const diffTime = Math.abs(now.getTime() - date.getTime())
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-      
+
       return (
         <div className="text-sm text-gray-900">
           <div>{date.toLocaleDateString('es-ES')}</div>

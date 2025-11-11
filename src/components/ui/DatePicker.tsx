@@ -1,47 +1,44 @@
 import { forwardRef, useState } from "react";
 
-interface SelectProps {
+interface DatePickerProps {
 	label?: string;
 	name: string;
-	options: { label: string; value: string }[];
 	value?: string;
-	onChange?: (value: string) => void;
-	onBlur?: (e: React.FocusEvent<HTMLSelectElement>) => void;
+	onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 	isInvalid?: boolean;
 	errorMessage?: string;
 	className?: string;
 	classContainer?: string;
-	placeholder?: string;
 	required?: boolean;
 	disabled?: boolean;
-	isDisabled?: boolean;
 	helperText?: string;
+	minDate?: string;
+	maxDate?: string;
+	placeholder?: string;
 }
 
-const Select = forwardRef<HTMLSelectElement, SelectProps>(
+const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
 	(
 		{
 			label,
 			name,
-			options,
 			value,
 			onChange,
-			onBlur,
 			isInvalid,
 			errorMessage,
 			className,
 			classContainer,
-			placeholder = "Seleccionar",
 			required,
 			disabled,
-			isDisabled,
 			helperText,
+			minDate,
+			maxDate,
+			placeholder = "Selecciona una fecha",
 			...props
 		},
 		ref
 	) => {
 		const [isFocused, setIsFocused] = useState(false);
-		const isSelectDisabled = disabled || isDisabled;
 
 		return (
 			<div className={`flex flex-col py-2 relative ${classContainer}`}>
@@ -56,46 +53,37 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
 				)}
 
 				<div className="relative">
-					<div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+					<div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
 						<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
 						</svg>
 					</div>
 
-					<select
+					<input
 						ref={ref}
 						id={name}
 						name={name}
-						value={value}
-						onChange={(e) => onChange?.(e.target.value)}
-						onBlur={(e) => {
-							setIsFocused(false);
-							onBlur?.(e);
-						}}
-						onFocus={() => setIsFocused(true)}
-						disabled={isSelectDisabled}
+						type="date"
 						className={`
-							w-full rounded-xl text-sm border-2 px-4 py-3 pr-11 outline-none transition-all duration-200 appearance-none cursor-pointer
+							w-full rounded-xl text-sm border-2 pl-11 pr-4 py-3 outline-none transition-all duration-200
 							${isInvalid
 								? 'border-red-500 bg-red-50 focus:border-red-600 focus:bg-red-50'
 								: isFocused
 									? 'border-purple-500 bg-purple-50/50 shadow-md'
 									: 'border-gray-300 bg-white hover:border-gray-400'
 							}
-							${isSelectDisabled ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''}
+							${disabled ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''}
 							${className}
 						`}
+						value={value}
+						onChange={onChange}
+						disabled={disabled}
+						min={minDate}
+						max={maxDate}
+						onFocus={() => setIsFocused(true)}
+						onBlur={() => setIsFocused(false)}
 						{...props}
-					>
-						<option disabled value="">
-							{placeholder}
-						</option>
-						{options.map((option) => (
-							<option key={option.value} value={option.value}>
-								{option.label}
-							</option>
-						))}
-					</select>
+					/>
 				</div>
 
 				{helperText && !isInvalid && (
@@ -115,6 +103,6 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
 	}
 );
 
-Select.displayName = 'Select';
+DatePicker.displayName = 'DatePicker';
 
-export default Select;
+export default DatePicker;

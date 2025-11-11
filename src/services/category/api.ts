@@ -1,11 +1,12 @@
-import type { 
-  ApiResponse, 
-  BusinessCategoryListResponse, 
+import type {
+  ApiResponse,
+  BusinessCategoryListResponse,
   ProductCategoryListResponse,
   BusinessCategory,
   CreateCategoryRequest,
   UpdateCategoryRequest
 } from '../../types/Category'
+import { handleEmptyListResponse } from '../../utils/apiHelpers'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -19,11 +20,10 @@ export const fetchBusinessCategories = async (token: string): Promise<ApiRespons
     },
   })
 
-  if (!response.ok) {
-    throw new Error(`Error al obtener categorías de negocios: ${response.statusText}`)
-  }
-
-  return response.json()
+  return handleEmptyListResponse<ApiResponse<BusinessCategoryListResponse>>(
+    response,
+    { status: 'success', data: { businessCategories: [] } } as ApiResponse<BusinessCategoryListResponse>
+  )
 }
 
 // Función para obtener una categoría de negocio específica por ID
@@ -117,11 +117,10 @@ export const fetchProductCategories = async (token: string): Promise<ApiResponse
     },
   })
 
-  if (!response.ok) {
-    throw new Error(`Error al obtener categorías de productos: ${response.statusText}`)
-  }
-
-  return response.json()
+  return handleEmptyListResponse<ApiResponse<ProductCategoryListResponse>>(
+    response,
+    { status: 'success', data: { productCategories: [] } } as ApiResponse<ProductCategoryListResponse>
+  )
 }
 
 export const createProductCategory = async (

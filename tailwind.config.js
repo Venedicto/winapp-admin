@@ -10,6 +10,15 @@ export default {
         primary: '#3F0066',
         'primary-dark': '#2a0044',
       },
+      animation: {
+        'spin': 'spin 1s linear infinite',
+      },
+      keyframes: {
+        spin: {
+          'from': { transform: 'rotate(0deg)' },
+          'to': { transform: 'rotate(360deg)' },
+        },
+      },
     },
   },
   plugins: [],

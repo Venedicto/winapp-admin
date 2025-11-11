@@ -1,11 +1,12 @@
-import type { 
-  ApiResponse, 
-  BusinessListResponse, 
+import type {
+  ApiResponse,
+  BusinessListResponse,
   DocumentListResponse,
   Business,
   UpdateBusinessStatusRequest,
   UpdateDocumentStatusRequest
 } from '../../types/Business'
+import { handleEmptyListResponse } from '../../utils/apiHelpers'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -19,11 +20,10 @@ export const fetchBusinesses = async (token: string): Promise<ApiResponse<Busine
     },
   })
 
-  if (!response.ok) {
-    throw new Error(`Error al obtener negocios: ${response.statusText}`)
-  }
-
-  return response.json()
+  return handleEmptyListResponse<ApiResponse<BusinessListResponse>>(
+    response,
+    { status: 'success', data: { businesses: [] } } as ApiResponse<BusinessListResponse>
+  )
 }
 
 export const fetchBusinessDocuments = async (token: string): Promise<ApiResponse<DocumentListResponse>> => {
@@ -34,11 +34,10 @@ export const fetchBusinessDocuments = async (token: string): Promise<ApiResponse
     },
   })
 
-  if (!response.ok) {
-    throw new Error(`Error al obtener documentos: ${response.statusText}`)
-  }
-
-  return response.json()
+  return handleEmptyListResponse<ApiResponse<DocumentListResponse>>(
+    response,
+    { status: 'success', data: { documents: [] } } as ApiResponse<DocumentListResponse>
+  )
 }
 
 // Función para obtener un comercio específico por ID

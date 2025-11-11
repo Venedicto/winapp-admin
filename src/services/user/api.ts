@@ -1,11 +1,10 @@
-import type { 
-  ApiResponse, 
+import type {
+  ApiResponse,
   User
 } from '../../types/User'
+import { handleEmptyListResponse } from '../../utils/apiHelpers'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
-
-
 
 export const fetchClients = async (token: string): Promise<ApiResponse<User[]>> => {
   const response = await fetch(`${API_URL}/users/clients`, {
@@ -15,9 +14,8 @@ export const fetchClients = async (token: string): Promise<ApiResponse<User[]>> 
     },
   })
 
-  if (!response.ok) {
-    throw new Error(`Error al obtener clientes: ${response.statusText}`)
-  }
-
-  return response.json()
+  return handleEmptyListResponse<ApiResponse<User[]>>(
+    response,
+    { status: 'success', data: [] } as ApiResponse<User[]>
+  )
 } 
