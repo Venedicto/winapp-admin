@@ -1,4 +1,4 @@
-import { forwardRef, useState, useRef, DragEvent } from 'react'
+import { forwardRef, useState, useRef, type DragEvent } from 'react'
 
 interface FileInputProps {
   label?: string

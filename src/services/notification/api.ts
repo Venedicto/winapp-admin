@@ -16,7 +16,7 @@ export const fetchNotifications = async (token: string): Promise<Notification[]>
 
   const responseData = await handleEmptyListResponse<ApiResponse<{notifications: Notification[]}>>(
     response,
-    { status: 'success', data: { notifications: [] } } as ApiResponse<{notifications: Notification[]}>
+    { status: 'success', data: { notifications: [] }, message: '' } as ApiResponse<{notifications: Notification[]}>
   )
 
   if (responseData.status === "error") {

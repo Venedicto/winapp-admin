@@ -36,7 +36,7 @@ export const fetchBusinessDocuments = async (token: string): Promise<ApiResponse
 
   return handleEmptyListResponse<ApiResponse<DocumentListResponse>>(
     response,
-    { status: 'success', data: { documents: [] } } as ApiResponse<DocumentListResponse>
+    { status: 'success', data: { businessDocs: [] } } as ApiResponse<DocumentListResponse>
   )
 }
 
