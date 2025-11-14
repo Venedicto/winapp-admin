@@ -69,11 +69,17 @@ function BusinessDocuments({ business }: BusinessDocumentsProps) {
             <div key={document.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-medium text-gray-900">
-                  {documentTypeLabels[document.type] || document.type}
+                  {documentTypeLabels[document.name] || document.name}
                 </h3>
-                
+
               </div>
-              
+
+              <div className="mb-2">
+                <p className="text-sm text-gray-700 truncate" title={document.url}>
+                  {document.url.split('/').pop() || 'Documento'}
+                </p>
+              </div>
+
               <div className="flex items-center justify-between">
                 <p className="text-sm text-gray-500">
                   Subido: {new Date(document.createdAt).toLocaleDateString('es-ES')}

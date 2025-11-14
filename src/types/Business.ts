@@ -53,12 +53,12 @@ export interface BusinessWithDetails {
 // Interface para documentos de negocio
 export interface BusinessDocument {
   id: string
-  type: 'bankingCertified' | 'dni' | 'constitutiveAct' | 'attorneyPower'
-  status: 'pending' | 'approved' | 'rejected'
+  name: 'bankingCertified' | 'dni' | 'constitutiveAct' | 'attorneyPower'
   url: string
   businessId: string
   createdAt: string
   updatedAt: string
+  deletedAt: string | null
 }
 
 // Interfaces para requests

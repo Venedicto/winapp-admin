@@ -15,11 +15,13 @@ function ActionButtons({ business }: ActionButtonsProps) {
   const { showSuccess, showError } = useToastHelpers()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  const handleViewDetails = () => {
+  const handleViewDetails = (e: React.MouseEvent) => {
+    e.stopPropagation()
     navigate(`/dashboard/comercios/${business.id}`)
   }
 
-  const handleDelete = () => {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation()
     setShowDeleteModal(true)
   }
 

@@ -146,7 +146,7 @@ export default function Dashboard() {
       value: stats.pendingBusinesses,
       icon: <HiClock className="w-8 h-8" color='#000'/>,
       loading: businessLoading,
-      onClick: () => navigate('/dashboard/comercios?status=pending'),
+      onClick: () => navigate(`/dashboard/comercios?status=${BUSINESS_STATUS.PENDING}`),
       growth: stats.pendingBusinesses > 0 ? {
         value: 'Requieren revisión',
         isPositive: false,
@@ -186,7 +186,7 @@ export default function Dashboard() {
   const quickActions = [
     {
       label: 'Revisar Pendientes',
-      onClick: () => navigate('/dashboard/comercios?status=pending'),
+      onClick: () => navigate(`/dashboard/comercios?status=${BUSINESS_STATUS.PENDING}`),
       count: stats.pendingBusinesses,
       color: 'orange' as const
     },

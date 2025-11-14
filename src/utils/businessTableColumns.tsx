@@ -67,8 +67,8 @@ export const getBusinessTableColumns = (): TableColumn<Business>[] => [
     width: '15%',
     hideOnMobile: true,
     render: (userId: string) => (
-      <div className="text-sm text-gray-900 font-medium w-full truncate">
-        {userId.replace('user_', '').substring(0, 12)}...
+      <div className="text-sm text-gray-600 w-full truncate" title={userId}>
+        ID: {userId.substring(0, 8)}...
       </div>
     )
   },
