@@ -1,4 +1,5 @@
 # 🔧 WinApp Backend - Panel de Administración
+#
 
 ## 📋 Resumen Ejecutivo
 
